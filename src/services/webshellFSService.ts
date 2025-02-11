@@ -1,7 +1,6 @@
 import { h } from 'vue'
 import type { VNodeChild } from 'vue'
 import type { TreeOption } from 'naive-ui/es/tree/src/interface'
-import { FolderOutlined, FileOutlined } from '@ant-design/icons-vue'
 
 import { FSTreeNode, FSService } from './base/fsService'
 import type { FSEntry } from './base/fsService'
@@ -48,7 +47,9 @@ export class WebshellFSTreeNode extends FSTreeNode<WebshellFSTreeNode> implement
   constructor(entry: FSEntry, parent?: WebshellFSTreeNode) {
     super(entry, parent)
 
-    this.prefix = this.isDir ? () => h(FolderOutlined) : () => h(FileOutlined)
+    this.prefix = this.isDir
+      ? () => h('div', { class: ['i-ant-design:folder-outlined'] })
+      : () => h('div', { class: ['i-ant-design:file-outlined'] })
     this.isLeaf = !this.isDir
   }
 
@@ -61,5 +62,5 @@ export class WebshellFSTreeNode extends FSTreeNode<WebshellFSTreeNode> implement
   }
 
   resolveEdit(_newName: string) {}
-  rejectEdit(_reason?: any) {}
+  rejectEdit(_reason?: unknown) {}
 }

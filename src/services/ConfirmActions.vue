@@ -1,25 +1,25 @@
 <template>
   <div class="flex gap-2 justify-end mt-6">
-    <Button @click="emit('skip')">
+    <NButton @click="emit('skip')">
       跳过
-    </Button>
-    <Button
+    </NButton>
+    <NButton
       type="primary"
       @click="emit('overwrite')"
     >
       替换
-    </Button>
-    <Button
+    </NButton>
+    <NButton
       type="primary"
       @click="emit('keepBoth')"
     >
       保留两者
-    </Button>
+    </NButton>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button } from 'ant-design-vue'
+  import { NButton } from 'naive-ui'
 
-const emit = defineEmits(['skip', 'overwrite', 'keepBoth'])
+  const emit = defineEmits(['skip', 'overwrite', 'keepBoth'])
 </script>

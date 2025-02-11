@@ -1,21 +1,24 @@
 import { WebSocketManager, type WebSocketManagerEventMap } from './base/webSocketManager'
-import { WebshellPTYService } from './webshellPTYService'
-import { WebshellFSService } from './webshellFSService'
+import { WebshellPTYService } from './webShellPTYService'
+import { WebshellFSService } from './webShellFSService'
 import { UploadService } from './base/uploadService'
-import { useWebshellUploadStore } from '../stores/upload'
+import { useWebshellUploadStore } from '../stores/webShellUpload'
 import type { UploadSession } from './base/uploadService'
 import { WebshellResource } from '../webshellResource'
 
 // 允许服务扩展 WebSocketManager 的事件类型
 export interface WebshellWSManagerEventMap extends WebSocketManagerEventMap {}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface WebshellWSManager {
   addEventListener<K extends keyof WebshellWSManagerEventMap>(
     type: K,
-    listener: (ev: WebshellWSManagerEventMap[K]) => any,
+    listener: (ev: WebshellWSManagerEventMap[K]) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class WebshellWSManager extends WebSocketManager {
   readonly ptyService: WebshellPTYService
   readonly fsService: WebshellFSService

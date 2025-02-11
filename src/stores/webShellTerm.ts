@@ -3,7 +3,7 @@ import { useEventListener } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
 import { Term } from '../xterm'
-import { useWebshellResourceStore } from './resource'
+import { useWebshellResourceStore } from './webShellResource'
 import { WebshellResource } from '../webshellResource'
 import { WebshellWSManager } from '../services/webshellWSManager'
 

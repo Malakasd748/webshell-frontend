@@ -134,6 +134,7 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
         queue.push(...node.children)
       }
     }
+    return undefined
   }
 }
 
@@ -142,7 +143,7 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
  *
  * AI 给的方案，能够使派生类的成员有正确的类型，不明觉厉。
  *
- * 设计成这样是为了让文件树服务与框架解耦，最大化可扩展性
+ * 让文件树服务与框架解耦
  */
 export interface FSTreeNode<T extends FSTreeNode<T>> extends FSEntry {}
 export class FSTreeNode<T extends FSTreeNode<T>> {

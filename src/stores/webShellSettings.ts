@@ -5,7 +5,7 @@ import xtermThemes from 'xterm-theme'
 import { defineStore } from 'pinia'
 
 import { setShellConfig, getShellConfig } from '@/api/webshell'
-import { useWebshellResourceStore } from './resource'
+import { useWebshellResourceStore } from './webShellResource'
 import type { HpcResource } from '../hpcResource'
 
 export const availableThemes: Record<string, ITheme> = pick(
