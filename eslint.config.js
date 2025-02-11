@@ -1,15 +1,37 @@
-import eslint from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+import eslint from '@eslint/js'
 
 export default tseslint.config(
-  stylistic.configs.customize(),
-  { files: ['**/*.{js,mjs,cjs,ts,vue}'] },
-  { languageOptions: { globals: globals.browser } },
+  { ignores: ['*.d.ts, **/dist'] },
   eslint.configs.recommended,
-  tseslint.configs.recommended,
-  pluginVue.configs['flat/essential'],
-  { files: ['**/*.vue'], languageOptions: { parserOptions: { parser: tseslint.parser } } },
+  tseslint.configs.eslintRecommended,
+  tseslint.configs.recommendedTypeChecked,
+  tseslint.configs.stylisticTypeChecked,
+  {
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+        extraFileExtensions: ['.vue'],
+      },
+    },
+  },
+  {
+    files: ['**/*.vue'],
+    extends: [pluginVue.configs['flat/recommended']],
+    languageOptions: {
+      parserOptions: {
+        parser: '@typescript-eslint/parser',
+      },
+    },
+  },
+  {
+    files: ['eslint.config.js'],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
+  stylistic.configs['recommended-flat'],
 )

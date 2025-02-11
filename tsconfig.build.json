@@ -7,7 +7,9 @@
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "types": ["node"],
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "checkJs": true,
   },
-  "include": ["*.config.ts"]
+  "include": ["*.config.ts, *.config.js"],
 }
