@@ -1,5 +1,8 @@
 <template>
-  <NConfigProvider :theme="dark ? darkTheme : null" abstract>
+  <NConfigProvider
+    :theme="dark ? darkTheme : null"
+    abstract
+  >
     <div
       class="flex-(~ col)"
       style="
@@ -22,11 +25,11 @@
               class="ml-auto"
               quaternary
               size="tiny"
-              @click="uploadStore.clearIdleSessions()"
               :disabled="!sessions.length"
               :focusable="false"
+              @click="uploadStore.clearIdleSessions()"
             >
-              <div class="i-ant-design:clear-outlined size-3.5"></div>
+              <div class="i-ant-design:clear-outlined size-3.5" />
             </NButton>
           </template>
         </NTooltip>
@@ -34,14 +37,24 @@
         <NTooltip content-class="w-max">
           收起
           <template #trigger>
-            <NButton quaternary size="tiny" @click="emit('hide-clicked')" :focusable="false">
-              <div class="i-ant-design:down-outlined size-3.5"></div>
+            <NButton
+              quaternary
+              size="tiny"
+              :focusable="false"
+              @click="emit('hide-clicked')"
+            >
+              <div class="i-ant-design:down-outlined size-3.5" />
             </NButton>
           </template>
         </NTooltip>
       </div>
 
-      <NList hoverable show-divider class="overflow-auto" style="background-color: #434343">
+      <NList
+        hoverable
+        show-divider
+        class="overflow-auto"
+        style="background-color: #434343"
+      >
         <UploadListItem
           v-for="(s, i) in sessions"
           :session="s"
@@ -55,22 +68,22 @@
 </template>
 
 <script setup lang="ts">
-  import { useTemplateRef } from 'vue';
-  import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui';
+import { useTemplateRef } from 'vue'
+import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui'
 
-  import UploadListItem from './UploadListItem.vue';
-  import { useWebshellUploadStore } from '../stores/upload';
+import UploadListItem from './UploadListItem.vue'
+import { useWebshellUploadStore } from '../stores/upload'
 
-  defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
-  const uploadStore = useWebshellUploadStore();
+const uploadStore = useWebshellUploadStore()
 
-  const { dark = false } = defineProps<{ dark?: boolean }>();
-  const emit = defineEmits<{
-    (e: 'hide-clicked');
-  }>();
+const { dark = false } = defineProps<{ dark?: boolean }>()
+const emit = defineEmits<{
+  (e: 'hide-clicked')
+}>()
 
-  const sessions = uploadStore.sessions;
+const sessions = uploadStore.sessions
 </script>
 
 <style scoped></style>

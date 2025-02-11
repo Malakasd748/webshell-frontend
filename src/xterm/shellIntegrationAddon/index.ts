@@ -1,7 +1,7 @@
-import { ref } from 'vue';
-import type { ITerminalAddon, IDisposable, IBuffer } from '@xterm/xterm';
+import { ref } from 'vue'
+import type { ITerminalAddon, IDisposable, IBuffer } from '@xterm/xterm'
 
-import type { Term } from '..';
+import type { Term } from '..'
 
 /**
  * Shell integration is a feature that enhances the terminal's understanding of what's happening
@@ -243,141 +243,142 @@ const enum ITermOscPt {
  * {@link [WezTerm](https://wezfurlong.org/wezterm/shell-integration.html)}
  */
 export class ShellIntegrationAddon implements ITerminalAddon {
-  public cwd = '';
+  public cwd = ''
 
-  private _terminal?: Term;
-  private _buffer?: IBuffer;
-  private _disposables: IDisposable[] = [];
+  private _terminal?: Term
+  private _buffer?: IBuffer
+  private _disposables: IDisposable[] = []
 
   activate(terminal: Term): void {
-    this._terminal = terminal;
-    this._buffer = terminal.buffer.normal;
+    this._terminal = terminal
+    this._buffer = terminal.buffer.normal
 
     this._disposables.push(
-      terminal.parser.registerOscHandler(ShellIntegrationOscPs.FinalTerm, (data) =>
+      terminal.parser.registerOscHandler(ShellIntegrationOscPs.FinalTerm, data =>
         this._handleFinalTermSequence(data),
       ),
-    );
+    )
     // this._disposables.push(
     //   terminal.parser.registerOscHandler(ShellIntegrationOscPs.VSCode, data =>
     //     this._handleVscodeSequence(data)
     //   )
     // )
     this._disposables.push(
-      terminal.parser.registerOscHandler(ShellIntegrationOscPs.ITerm, (data) =>
+      terminal.parser.registerOscHandler(ShellIntegrationOscPs.ITerm, data =>
         this._handleITermSequence(data),
       ),
-    );
+    )
     this._disposables.push(
-      terminal.parser.registerOscHandler(ShellIntegrationOscPs.SetCwd, (data) =>
+      terminal.parser.registerOscHandler(ShellIntegrationOscPs.SetCwd, data =>
         this._handleSetCwd(data),
       ),
-    );
+    )
   }
 
   private _handleSetCwd(data: string): boolean {
     if (!this._terminal) {
-      return false;
+      return false
     }
 
-    const [uri] = data.split(';');
+    const [uri] = data.split(';')
 
-    if (uri.match(/^file:\/\/.*\//)) {
-      const idx = uri.indexOf('/', 7);
-      const path = uri.slice(idx);
+    if (/^file:\/\/.*\//.exec(uri)) {
+      const idx = uri.indexOf('/', 7)
+      const path = uri.slice(idx)
       if (path) {
-        this.cwd = path;
-        return true;
+        this.cwd = path
+        return true
       }
     }
 
-    return false;
+    return false
   }
 
   private _handleFinalTermSequence(data: string): boolean {
     if (!this._terminal || !this._buffer) {
-      return false;
+      return false
     }
 
-    const [command] = data.split(';');
+    const [command] = data.split(';')
 
     switch (command) {
     }
 
-    return false;
+    return false
   }
 
   private _handleITermSequence(data: string): boolean {
     if (!this._terminal) {
-      return false;
+      return false
     }
 
-    const [command] = data.split(';');
+    const [command] = data.split(';')
 
     switch (command) {
       case ITermOscPt.SetMark:
         // console.error(ITermOscPt.SetMark, 'not implemented')
-        return false;
+        return false
       default: {
-        const [key, value] = command.split('=', 2);
+        const [key, value] = command.split('=', 2)
         if (value === undefined) {
-          return true;
+          return true
         }
 
         switch (key) {
           case ITermOscPt.CurrentDir:
-            this.cwd = value;
-            return true;
+            this.cwd = value
+            return true
         }
       }
     }
 
-    return false;
+    return false
   }
 
   private _handleVscodeSequence(data: string): boolean {
     if (!this._terminal) {
-      return false;
+      return false
     }
 
-    let command: string;
-    let params: string | undefined = undefined;
-    const idx = data.indexOf(';');
+    let command: string
+    let params: string | undefined = undefined
+    const idx = data.indexOf(';')
     if (idx < 0) {
-      command = data;
-    } else {
-      command = data.slice(0, idx);
-      params = data.slice(idx + 1);
+      command = data
+    }
+    else {
+      command = data.slice(0, idx)
+      params = data.slice(idx + 1)
     }
 
     switch (command) {
       case VSCodeOscPt.Property:
-        this._handleVscProperty(params);
-        return true;
+        this._handleVscProperty(params)
+        return true
       case VSCodeOscPt.SetMark:
-        return false;
+        return false
     }
 
-    return false;
+    return false
   }
 
   private _handleVscProperty(params: string | undefined) {
     if (params === undefined) {
-      return;
+      return
     }
 
-    const [key, value] = params.split('=', 2);
+    const [key, value] = params.split('=', 2)
     if (value === undefined) {
-      return;
+      return
     }
 
     switch (key) {
       case VSCodeProperty.Cwd:
-        this.cwd = value;
+        this.cwd = value
     }
   }
 
   dispose(): void {
-    this._disposables.forEach((d) => d.dispose());
+    this._disposables.forEach(d => d.dispose())
   }
 }

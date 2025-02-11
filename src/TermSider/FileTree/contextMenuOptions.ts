@@ -1,12 +1,12 @@
-import type { DropdownOption, DropdownDividerOption } from 'naive-ui';
+import type { DropdownOption, DropdownDividerOption } from 'naive-ui'
 
-type ContextMenuOption = DropdownOption | DropdownDividerOption;
+type ContextMenuOption = DropdownOption | DropdownDividerOption
 
-type Param = {
-  multiple: boolean;
-  showPaste: boolean;
-  isRoot: boolean;
-};
+interface Param {
+  multiple: boolean
+  showPaste: boolean
+  isRoot: boolean
+}
 export function useContextMenuOptions({ multiple, showPaste, isRoot }: Param): ContextMenuOption[] {
   return [
     // { label: '新建文件', key: 'newFile', show: !multiple },
@@ -25,5 +25,5 @@ export function useContextMenuOptions({ multiple, showPaste, isRoot }: Param): C
     { label: '下载', key: 'download' },
     { label: '上传文件', key: 'uploadFile', show: !multiple },
     { label: '上传文件夹', key: 'uploadFolder', show: !multiple },
-  ];
+  ]
 }

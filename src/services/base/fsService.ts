@@ -1,7 +1,7 @@
-import { join } from 'pathe';
+import { join } from 'pathe'
 
-import type { WebSocketManager } from './webSocketManager';
-import { WebSocketService } from './webSocketServiceBase';
+import type { WebSocketManager } from './webSocketManager'
+import { WebSocketService } from './webSocketServiceBase'
 
 const enum FSAction {
   List = 'list',
@@ -14,55 +14,55 @@ const enum FSAction {
 }
 
 export interface FSEntry {
-  readonly name: string;
-  readonly path: string;
-  readonly isDir: boolean;
-  readonly size: number;
-  readonly mode: number;
-  readonly modTime: number;
+  readonly name: string
+  readonly path: string
+  readonly isDir: boolean
+  readonly size: number
+  readonly mode: number
+  readonly modTime: number
 }
 
-type FSActionMap = {
+interface FSActionMap {
   [FSAction.List]: {
-    request: { showHidden: boolean };
-    response: { entries: FSEntry[] };
-  };
+    request: { showHidden: boolean }
+    response: { entries: FSEntry[] }
+  }
   [FSAction.GetRoot]: {
-    request: void;
-    response: FSEntry;
-  };
+    request: void
+    response: FSEntry
+  }
   [FSAction.Rename]: {
-    request: { newName: string };
-    response: void;
-  };
+    request: { newName: string }
+    response: void
+  }
   [FSAction.Create]: {
-    request: { name: string; isDir: boolean };
-    response: void;
-  };
+    request: { name: string, isDir: boolean }
+    response: void
+  }
   [FSAction.Delete]: {
-    request: void;
-    response: void;
-  };
+    request: void
+    response: void
+  }
   [FSAction.Copy]: {
-    request: { dest: string };
-    response: void;
-  };
+    request: { dest: string }
+    response: void
+  }
   [FSAction.Move]: {
-    request: { dest: string };
-    response: void;
-  };
-};
+    request: { dest: string }
+    response: void
+  }
+}
 
 export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
-  public readonly name = 'fs';
-  public nodes: Node[] = [];
-  public showHidden = false;
+  public readonly name = 'fs'
+  public nodes: Node[] = []
+  public showHidden = false
 
   constructor(
     protected override manager: WebSocketManager,
     private nodeFactory: (entry: FSEntry, parent?: Node) => Node,
   ) {
-    super(manager);
+    super(manager)
   }
 
   protected async request<T extends FSAction>(
@@ -75,63 +75,63 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
       action,
       id,
       data,
-    });
+    })
   }
 
   override handleAction(_action: string, _id: string, _data: unknown): void {}
 
   override dispose(): void {
-    this.nodes = [];
+    this.nodes = []
   }
 
   async move(node: Node, dest: string) {
-    await this.request(node.path, FSAction.Move, { dest });
+    await this.request(node.path, FSAction.Move, { dest })
   }
 
   async copy(node: Node, dest: string) {
-    await this.request(node.path, FSAction.Copy, { dest });
+    await this.request(node.path, FSAction.Copy, { dest })
   }
 
   async delete(node: Node) {
-    await this.request(node.path, FSAction.Delete, undefined);
-    const idx = node.parent?.children?.indexOf(node);
+    await this.request(node.path, FSAction.Delete, undefined)
+    const idx = node.parent?.children?.indexOf(node)
     if (idx !== undefined && idx > -1) {
-      node.parent?.children?.splice(idx, 1);
+      node.parent?.children?.splice(idx, 1)
     }
   }
 
   async create(parent: Node, isDir: boolean, name: string) {
-    await this.request(join(parent.path, name), FSAction.Create, { name, isDir });
-    await this.getChildren(parent);
+    await this.request(join(parent.path, name), FSAction.Create, { name, isDir })
+    await this.getChildren(parent)
   }
 
   async rename(node: Node, newName: string) {
-    await this.request(node.path, FSAction.Rename, { newName });
+    await this.request(node.path, FSAction.Rename, { newName })
     // 假定根节点是不能改名的
-    await this.getChildren(node.parent!);
+    await this.getChildren(node.parent!)
   }
 
   async getChildren(node: Node) {
     const { entries } = await this.request(node.path, FSAction.List, {
       showHidden: this.showHidden,
-    });
-    node.children = entries.map((entry) => this.nodeFactory(entry, node));
+    })
+    node.children = entries.map(entry => this.nodeFactory(entry, node))
   }
 
   async getRoot() {
-    const entry = await this.request('/', FSAction.GetRoot, undefined);
-    this.nodes = [this.nodeFactory(entry)];
+    const entry = await this.request('/', FSAction.GetRoot, undefined)
+    this.nodes = [this.nodeFactory(entry)]
   }
 
   getNodeByPathBFS(path: string) {
-    const queue = [...this.nodes];
+    const queue = [...this.nodes]
     while (queue.length) {
-      const node = queue.shift()!;
+      const node = queue.shift()!
       if (node.path === path) {
-        return node;
+        return node
       }
       if (node.children) {
-        queue.push(...node.children);
+        queue.push(...node.children)
       }
     }
   }
@@ -146,9 +146,9 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
  */
 export interface FSTreeNode<T extends FSTreeNode<T>> extends FSEntry {}
 export class FSTreeNode<T extends FSTreeNode<T>> {
-  public children?: T[];
+  public children?: T[]
 
   constructor(entry: FSEntry, public readonly parent?: T) {
-    Object.assign(this, entry);
+    Object.assign(this, entry)
   }
 }

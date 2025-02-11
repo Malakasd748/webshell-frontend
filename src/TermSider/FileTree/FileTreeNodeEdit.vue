@@ -19,7 +19,9 @@
       <template v-if="nameInvalid === 'exists'">
         <span class="font-bold">{{ inputModel }}</span> 已存在，请选择其他名称
       </template>
-      <template v-else-if="nameInvalid === 'empty'"> 名称不能为空 </template>
+      <template v-else-if="nameInvalid === 'empty'">
+        名称不能为空
+      </template>
       <template v-else-if="nameInvalid === 'invalid'">
         <span class="font-bold">{{ inputModel }}</span> 不是合法名称，请选择其他名称
       </template>
@@ -27,82 +29,83 @@
 
     <template #trigger>
       <NInput
+        ref="inputRef"
+        v-model:value="inputModel"
         size="tiny"
         placeholder=""
-        v-model:value="inputModel"
-        @keydown="onKeydown"
-        @blur="onBlur"
-        ref="inputRef"
         style="font-size: 14px"
         :status="nameInvalid ? 'error' : undefined"
+        @keydown="onKeydown"
+        @blur="onBlur"
       />
     </template>
   </NTooltip>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, useTemplateRef } from 'vue';
-  import { NInput, NTooltip, useThemeVars } from 'naive-ui';
+import { ref, computed, onMounted, useTemplateRef } from 'vue'
+import { NInput, NTooltip, useThemeVars } from 'naive-ui'
 
-  const { checkNameExisted, value } = defineProps<{
-    value: string;
-    checkNameExisted(name: string): boolean;
-  }>();
-  const emit = defineEmits<{
-    (e: 'update:value', value: string): void;
-    (e: 'cancel'): void;
-  }>();
+const { checkNameExisted, value } = defineProps<{
+  value: string
+  checkNameExisted(name: string): boolean
+}>()
+const emit = defineEmits<{
+  (e: 'update:value', value: string): void
+  (e: 'cancel'): void
+}>()
 
-  const inputModel = ref(value);
-  const nameInvalid = computed(() => {
-    if (inputModel.value.length === 0) {
-      return 'empty';
-    }
-    if (inputModel.value.includes('/')) {
-      return 'invalid';
-    }
-    if (checkNameExisted(inputModel.value)) {
-      return 'exists';
-    }
-    return false;
-  });
-
-  const theme = useThemeVars();
-
-  let cancelled = false;
-  function onKeydown(ev: KeyboardEvent) {
-    if (ev.key === 'Escape') {
-      emit('cancel');
-      cancelled = true;
-    } else if (ev.key === 'Enter') {
-      if (nameInvalid.value) {
-        return;
-      }
-      if (inputModel.value === value) {
-        emit('cancel');
-        cancelled = true;
-        return;
-      }
-      emit('update:value', inputModel.value);
-    }
+const inputModel = ref(value)
+const nameInvalid = computed(() => {
+  if (inputModel.value.length === 0) {
+    return 'empty'
   }
-
-  function onBlur() {
-    if (cancelled) {
-      return;
-    }
-    if (nameInvalid.value || inputModel.value === value) {
-      emit('cancel');
-      return;
-    }
-    emit('update:value', inputModel.value);
+  if (inputModel.value.includes('/')) {
+    return 'invalid'
   }
+  if (checkNameExisted(inputModel.value)) {
+    return 'exists'
+  }
+  return false
+})
 
-  const inputRef = useTemplateRef('inputRef');
-  onMounted(() => {
-    inputRef.value!.focus();
-    inputRef.value!.select();
-  });
+const theme = useThemeVars()
+
+let cancelled = false
+function onKeydown(ev: KeyboardEvent) {
+  if (ev.key === 'Escape') {
+    emit('cancel')
+    cancelled = true
+  }
+  else if (ev.key === 'Enter') {
+    if (nameInvalid.value) {
+      return
+    }
+    if (inputModel.value === value) {
+      emit('cancel')
+      cancelled = true
+      return
+    }
+    emit('update:value', inputModel.value)
+  }
+}
+
+function onBlur() {
+  if (cancelled) {
+    return
+  }
+  if (nameInvalid.value || inputModel.value === value) {
+    emit('cancel')
+    return
+  }
+  emit('update:value', inputModel.value)
+}
+
+const inputRef = useTemplateRef('inputRef')
+onMounted(() => {
+  inputRef.value!.focus()
+  inputRef.value!.select()
+})
 </script>
 
 <style scoped>

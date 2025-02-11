@@ -1,1 +1,1 @@
-export { default } from './TermHeader.vue';
+export { default } from './TermHeader.vue'

@@ -1,5 +1,5 @@
-import { WebshellResource, type WebshellResourceInit } from './webshellResource'
 import { launchShell } from '@/api/webshell'
+import { WebshellResource, type WebshellResourceInit } from './webshellResource'
 
 export interface HpcResourceInit extends WebshellResourceInit {
   id: string

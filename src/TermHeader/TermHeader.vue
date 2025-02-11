@@ -1,21 +1,28 @@
 <template>
   <div class="flex-(~ items-center) pr-5">
-    <NScrollbar x-scrollable class="w-auto max-w-3/4 mr-2">
-      <NTabs type="segment" animated v-model:value="activeTab">
+    <NScrollbar
+      x-scrollable
+      class="w-auto max-w-3/4 mr-2"
+    >
+      <NTabs
+        v-model:value="activeTab"
+        type="segment"
+        animated
+      >
         <NTab
+          :ref="(inst: any) => (tabRefs.settings = inst?.$el)"
           name="settings"
           style="width: 100px; gap: 8px"
-          :ref="(inst: any) => (tabRefs.settings = inst?.$el)"
         >
-          <div class="i-ant-design:setting-outlined"></div>
+          <div class="i-ant-design:setting-outlined" />
           设置
         </NTab>
         <NTab
           v-for="(t, i) in terms"
-          :name="t.id"
           :key="t.id"
-          style="width: 120px; gap: 8px"
           :ref="(inst: any) => (tabRefs[t.id] = inst?.$el)"
+          :name="t.id"
+          style="width: 120px; gap: 8px"
         >
           {{ TermManagerRegistry.getManager(t)?.resource.name }}
 
@@ -24,10 +31,10 @@
             :quaternary="false"
             @click="
               delete tabRefs[t.id]
-              // webshellStore.removeTerm(i);
+            // webshellStore.removeTerm(i);
             "
           >
-            <div class="i-ant-design:close-outlined"></div>
+            <div class="i-ant-design:close-outlined" />
           </DefaultButton>
         </NTab>
       </NTabs>
@@ -36,10 +43,10 @@
     <ResourcePopselect>
       <DefaultButton
         class="tab-bar-btn"
-        @click="webshellResourceStore.selectedResourceId && webshellTermStore.addTerm()"
         :loading="false"
+        @click="webshellResourceStore.selectedResourceId && webshellTermStore.addTerm()"
       >
-        <div class="i-ant-design:plus-outlined tab-bar-icon"></div>
+        <div class="i-ant-design:plus-outlined tab-bar-icon" />
       </DefaultButton>
     </ResourcePopselect>
 
@@ -48,10 +55,10 @@
       <div
         class="i-ant-design:api-outlined tab-bar-icon"
         @click="webshellTermStore.addTerm(new LocalhostResource({ name: 'localhost' }))"
-      ></div>
+      />
     </DefaultButton>
 
-    <!-- 
+    <!--
     <NTooltip>
       垂直分屏
       <template #trigger>
@@ -73,20 +80,26 @@
     <NTooltip v-if="!webshellStateStore.isFullscreen">
       全屏
       <template #trigger>
-        <DefaultButton class="tab-bar-btn ml-auto" @click="emit('enter-fullscreen')">
-          <div class="i-ant-design:fullscreen-outlined tab-bar-icon"></div>
+        <DefaultButton
+          class="tab-bar-btn ml-auto"
+          @click="emit('enter-fullscreen')"
+        >
+          <div class="i-ant-design:fullscreen-outlined tab-bar-icon" />
         </DefaultButton>
       </template>
     </NTooltip>
     <NTooltip v-else>
       退出全屏
       <template #trigger>
-        <DefaultButton class="tab-bar-btn ml-auto" @click="emit('quit-fullscreen')">
-          <div class="i-ant-design:fullscreen-exit-outlined tab-bar-icon"></div>
+        <DefaultButton
+          class="tab-bar-btn ml-auto"
+          @click="emit('quit-fullscreen')"
+        >
+          <div class="i-ant-design:fullscreen-exit-outlined tab-bar-icon" />
         </DefaultButton>
       </template>
     </NTooltip>
-    <!-- 
+    <!--
     <NDivider vertical />
 
     <NTooltip>
@@ -109,55 +122,55 @@
 
     <NDivider vertical />
 
-    <div class="i-ant-design:user-outlined tab-bar-icon mx-2"></div>
+    <div class="i-ant-design:user-outlined tab-bar-icon mx-2" />
     <div> {{ userStore.getUserInfo.username }} </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { watch } from 'vue';
-  import { NTabs, NTab, NTooltip, NDivider, NScrollbar } from 'naive-ui';
+import { watch } from 'vue'
+import { NTabs, NTab, NTooltip, NDivider, NScrollbar } from 'naive-ui'
 
-  import type { Term } from '../xterm';
-  import { useUserStore } from '@/store/modules/user';
-  import ResourcePopselect from './ResourcePopselect.vue';
-  import DefaultButton from '../DefaultButton.vue';
-  import { useWebshellTermStore } from '../stores/term';
-  import { useWebshellStateStore } from '../stores/states';
-  import { useWebshellResourceStore } from '../stores/resource';
-  import { TermManagerRegistry } from '../termManagerRegistry';
-  import { LocalhostResource } from './localHostResource';
+import type { Term } from '../xterm'
+import { useUserStore } from '@/store/modules/user'
+import ResourcePopselect from './ResourcePopselect.vue'
+import DefaultButton from '../DefaultButton.vue'
+import { useWebshellTermStore } from '../stores/term'
+import { useWebshellStateStore } from '../stores/states'
+import { useWebshellResourceStore } from '../stores/resource'
+import { TermManagerRegistry } from '../termManagerRegistry'
+import { LocalhostResource } from './localHostResource'
 
-  const userStore = useUserStore();
-  const webshellStateStore = useWebshellStateStore();
-  const webshellResourceStore = useWebshellResourceStore();
-  const webshellTermStore = useWebshellTermStore();
+const userStore = useUserStore()
+const webshellStateStore = useWebshellStateStore()
+const webshellResourceStore = useWebshellResourceStore()
+const webshellTermStore = useWebshellTermStore()
 
-  const terms = webshellTermStore.terms as Term[];
+const terms = webshellTermStore.terms as Term[]
 
-  if (!userStore.getUserInfo) {
-    window.location.href = '/login';
+if (!userStore.getUserInfo) {
+  window.location.href = '/login'
+}
+
+const activeTab = defineModel<string | undefined>('activeTab', { required: true })
+const emit = defineEmits<{
+  (e: 'vertical-split'): void
+  (e: 'horizontal-split'): void
+  (e: 'enter-fullscreen'): void
+  (e: 'quit-fullscreen'): void
+  (e: 'common-commands'): void
+  (e: 'documentation'): void
+}>()
+
+const tabRefs: Record<string, HTMLDivElement> = {}
+
+watch(activeTab, (activeTab) => {
+  if (!activeTab) {
+    return
   }
-
-  const activeTab = defineModel<string | undefined>('activeTab', { required: true });
-  const emit = defineEmits<{
-    (e: 'vertical-split'): void;
-    (e: 'horizontal-split'): void;
-    (e: 'enter-fullscreen'): void;
-    (e: 'quit-fullscreen'): void;
-    (e: 'common-commands'): void;
-    (e: 'documentation'): void;
-  }>();
-
-  const tabRefs: { [id: string]: HTMLDivElement } = {};
-
-  watch(activeTab, (activeTab) => {
-    if (!activeTab) {
-      return;
-    }
-    const el = tabRefs[activeTab];
-    el?.scrollIntoView({ behavior: 'smooth' });
-  });
+  const el = tabRefs[activeTab]
+  el?.scrollIntoView({ behavior: 'smooth' })
+})
 </script>
 
 <style scoped>

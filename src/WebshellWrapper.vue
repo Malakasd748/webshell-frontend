@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-  import Providers from './Providers';
-  import WebShell from './WebShell.vue';
+import Providers from './Providers'
+import WebShell from './WebShellComponent.vue'
 </script>
 
 <style scoped></style>

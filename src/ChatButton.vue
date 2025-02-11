@@ -1,6 +1,7 @@
 <template>
   <div>
     <NFloatButton
+      v-show="!showDrawer"
       :left="x"
       :top="y"
       shape="square"
@@ -11,9 +12,11 @@
         showDrawer = true;
         inputValue = initialInput;
       "
-      v-show="!showDrawer"
     >
-      <img :src="ChatImg" class="absolute inset-0 size-full object-contain" />
+      <img
+        :src="ChatImg"
+        class="absolute inset-0 size-full object-contain"
+      />
     </NFloatButton>
 
     <NDrawer
@@ -35,7 +38,10 @@
         footer-class="relative before:(absolute inset-0 top--1 blur-6px content-[''] bg-#1F1F1F)"
       >
         <template #header>
-          <img :src="ChatImg" class="size-6 object-contain" />
+          <img
+            :src="ChatImg"
+            class="size-6 object-contain"
+          />
         </template>
 
         <div class="flex-(~ col gap-4) text-xs">
@@ -52,7 +58,7 @@
             }"
           >
             <template v-if="m.role === 'assistant' && !m.content">
-              <div class="loader"></div>
+              <div class="loader" />
             </template>
             <template v-else>
               {{ m.content }}
@@ -62,10 +68,9 @@
 
         <template #footer>
           <NInput
+            ref="inputRef"
             v-model:value="inputValue"
             :disabled="inputDisabled"
-            @keydown="handleInputKeyDown"
-            ref="inputRef"
             type="textarea"
             size="small"
             :autosize="{ minRows: 1, maxRows: 7 }"
@@ -74,6 +79,7 @@
             }"
             placeholder="有什么问题尽管问我"
             class="py-6.5px"
+            @keydown="handleInputKeyDown"
           >
             <template #suffix>
               <NButton
@@ -81,11 +87,11 @@
                 :focusable="false"
                 quaternary
                 style="padding-inline: 4px"
-                @click="sendInput"
                 :disabled="inputDisabled"
                 class="self-end mb-3.75px"
+                @click="sendInput"
               >
-                <div class="i-mdi:telegram size-4"></div>
+                <div class="i-mdi:telegram size-4" />
               </NButton>
             </template>
           </NInput>
@@ -96,69 +102,70 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, shallowReactive, watch, useTemplateRef } from 'vue';
-  import { message } from 'ant-design-vue';
-  import { NFloatButton, NDrawer, NDrawerContent, NInput, NButton } from 'naive-ui';
-  import { useKeyModifier } from '@vueuse/core';
+import { ref, shallowReactive, watch, useTemplateRef } from 'vue'
+import { message } from 'ant-design-vue'
+import { NFloatButton, NDrawer, NDrawerContent, NInput, NButton } from 'naive-ui'
+import { useKeyModifier } from '@vueuse/core'
 
-  import { getChatResponse } from '@/api/webshell';
+import { getChatResponse } from '@/api/webshell'
 
-  import ChatImg from '@/assets/images/webshell/chat.png';
+import ChatImg from '@/assets/images/webshell/chat.png'
 
-  const { initialInput } = defineProps<{
-    x: number;
-    y: number;
-    drawerTo: string;
-    initialInput: string;
-  }>();
+const { initialInput } = defineProps<{
+  x: number
+  y: number
+  drawerTo: string
+  initialInput: string
+}>()
 
-  interface ChatMessage {
-    role: 'system' | 'assistant' | 'user';
-    content: string;
+interface ChatMessage {
+  role: 'system' | 'assistant' | 'user'
+  content: string
+}
+
+const messages = shallowReactive([] as ChatMessage[])
+const showDrawer = ref(false)
+const inputRef = useTemplateRef('inputRef')
+const inputValue = ref('')
+const inputDisabled = ref(false)
+
+watch(showDrawer, (show) => {
+  if (show) {
+    setTimeout(() => inputRef.value?.focus(), 200)
   }
+})
 
-  const messages = shallowReactive([] as ChatMessage[]);
-  const showDrawer = ref(false);
-  const inputRef = useTemplateRef('inputRef');
-  const inputValue = ref('');
-  const inputDisabled = ref(false);
+function sendInput() {
+  messages.push({ role: 'user', content: inputValue.value })
+  messages.push({ role: 'assistant', content: '' })
 
-  watch(showDrawer, (show) => {
-    if (show) {
-      setTimeout(() => inputRef.value?.focus(), 200);
+  getChatResponse(inputValue.value)
+    .then((res) => {
+      messages.at(-1)!.content = res.content
+    })
+    .catch((err) => {
+      message.error(err.message ?? err.response?.data?.reponse?.error)
+      messages.pop()
+    })
+    .finally(() => {
+      inputDisabled.value = false
+    })
+
+  inputValue.value = ''
+  inputDisabled.value = true
+}
+
+const shiftPressed = useKeyModifier('Shift')
+function handleInputKeyDown(ev: KeyboardEvent) {
+  if (ev.key === 'Enter') {
+    if (shiftPressed.value) {
+      return
     }
-  });
-
-  function sendInput() {
-    messages.push({ role: 'user', content: inputValue.value });
-    messages.push({ role: 'assistant', content: '' });
-
-    getChatResponse(inputValue.value)
-      .then((res) => {
-        messages.at(-1)!.content = res.content;
-      })
-      .catch((err) => {
-        message.error(err.message ?? err.response?.data?.reponse?.error);
-        messages.pop();
-      })
-      .finally(() => {
-        inputDisabled.value = false;
-      });
-
-    inputValue.value = '';
-    inputDisabled.value = true;
-  }
-
-  const shiftPressed = useKeyModifier('Shift');
-  function handleInputKeyDown(ev: KeyboardEvent) {
-    if (ev.key === 'Enter') {
-      if (shiftPressed.value) {
-        return;
-      } else {
-        sendInput();
-      }
+    else {
+      sendInput()
     }
   }
+}
 </script>
 
 <style scoped>

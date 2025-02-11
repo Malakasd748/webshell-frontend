@@ -1,1 +1,1 @@
-export { default } from './Providers.vue';
+export { default } from './Providers.vue'

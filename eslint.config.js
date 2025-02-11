@@ -28,6 +28,9 @@ export default tseslint.config(
         parser: '@typescript-eslint/parser',
       },
     },
+    rules: {
+      'vue/html-self-closing': ['error', { html: { void: 'always' } }],
+    },
   },
   {
     files: ['eslint.config.js'],
