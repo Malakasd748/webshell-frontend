@@ -7,20 +7,29 @@ import type { Term } from '.'
 // pollyfill
 if (!Element.prototype.checkVisibility) {
   Element.prototype.checkVisibility = function () {
-    // 检查是否在 DOM 中
+    // 检查元素是否在 DOM 中
     if (!document.contains(this)) {
       return false
     }
 
-    // 仅检查 display: none
-    const hasDisplay = (element: Element): boolean => {
+    const computeVisibility = (element: Element): boolean => {
       if (!element) return true
+
       const style = window.getComputedStyle(element)
+
+      // 检查关键的可见性属性
       if (style.display === 'none') return false
-      return element.parentElement ? hasDisplay(element.parentElement) : true
+      if (style.visibility === 'hidden' || style.visibility === 'collapse') return false
+      if (parseFloat(style.opacity) === 0) return false
+
+      // 检查元素大小
+      const rect = element.getBoundingClientRect()
+      if (rect.width === 0 && rect.height === 0) return false
+
+      return element.parentElement ? computeVisibility(element.parentElement) : true
     }
 
-    return hasDisplay(this)
+    return computeVisibility(this)
   }
 }
 
