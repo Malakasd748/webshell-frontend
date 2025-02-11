@@ -58,7 +58,7 @@
             }"
           >
             <template v-if="m.role === 'assistant' && !m.content">
-              <div class="loader" />
+              <div class="loader"></div>
             </template>
             <template v-else>
               {{ m.content }}
@@ -91,7 +91,7 @@
                 class="self-end mb-3.75px"
                 @click="sendInput"
               >
-                <div class="i-mdi:telegram size-4" />
+                <div class="i-mdi:telegram size-4"></div>
               </NButton>
             </template>
           </NInput>
@@ -102,70 +102,70 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowReactive, watch, useTemplateRef } from 'vue'
-import { message } from 'ant-design-vue'
-import { NFloatButton, NDrawer, NDrawerContent, NInput, NButton } from 'naive-ui'
-import { useKeyModifier } from '@vueuse/core'
+  import { ref, shallowReactive, watch, useTemplateRef } from 'vue'
+  import { message } from 'ant-design-vue'
+  import { NFloatButton, NDrawer, NDrawerContent, NInput, NButton } from 'naive-ui'
+  import { useKeyModifier } from '@vueuse/core'
 
-import { getChatResponse } from '@/api/webshell'
+  import { getChatResponse } from '@/api/webshell'
 
-import ChatImg from '@/assets/images/webshell/chat.png'
+  import ChatImg from '@/assets/images/webshell/chat.png'
 
-const { initialInput } = defineProps<{
-  x: number
-  y: number
-  drawerTo: string
-  initialInput: string
-}>()
+  const { initialInput } = defineProps<{
+    x: number
+    y: number
+    drawerTo: string
+    initialInput: string
+  }>()
 
-interface ChatMessage {
-  role: 'system' | 'assistant' | 'user'
-  content: string
-}
-
-const messages = shallowReactive([] as ChatMessage[])
-const showDrawer = ref(false)
-const inputRef = useTemplateRef('inputRef')
-const inputValue = ref('')
-const inputDisabled = ref(false)
-
-watch(showDrawer, (show) => {
-  if (show) {
-    setTimeout(() => inputRef.value?.focus(), 200)
+  interface ChatMessage {
+    role: 'system' | 'assistant' | 'user'
+    content: string
   }
-})
 
-function sendInput() {
-  messages.push({ role: 'user', content: inputValue.value })
-  messages.push({ role: 'assistant', content: '' })
+  const messages = shallowReactive([] as ChatMessage[])
+  const showDrawer = ref(false)
+  const inputRef = useTemplateRef('inputRef')
+  const inputValue = ref('')
+  const inputDisabled = ref(false)
 
-  getChatResponse(inputValue.value)
-    .then((res) => {
-      messages.at(-1)!.content = res.content
-    })
-    .catch((err) => {
-      message.error(err.message ?? err.response?.data?.reponse?.error)
-      messages.pop()
-    })
-    .finally(() => {
-      inputDisabled.value = false
-    })
-
-  inputValue.value = ''
-  inputDisabled.value = true
-}
-
-const shiftPressed = useKeyModifier('Shift')
-function handleInputKeyDown(ev: KeyboardEvent) {
-  if (ev.key === 'Enter') {
-    if (shiftPressed.value) {
-      return
+  watch(showDrawer, (show) => {
+    if (show) {
+      setTimeout(() => inputRef.value?.focus(), 200)
     }
-    else {
-      sendInput()
+  })
+
+  function sendInput() {
+    messages.push({ role: 'user', content: inputValue.value })
+    messages.push({ role: 'assistant', content: '' })
+
+    getChatResponse(inputValue.value)
+      .then((res) => {
+        messages.at(-1)!.content = res.content
+      })
+      .catch((err) => {
+        message.error(err.message ?? err.response?.data?.reponse?.error)
+        messages.pop()
+      })
+      .finally(() => {
+        inputDisabled.value = false
+      })
+
+    inputValue.value = ''
+    inputDisabled.value = true
+  }
+
+  const shiftPressed = useKeyModifier('Shift')
+  function handleInputKeyDown(ev: KeyboardEvent) {
+    if (ev.key === 'Enter') {
+      if (shiftPressed.value) {
+        return
+      }
+      else {
+        sendInput()
+      }
     }
   }
-}
 </script>
 
 <style scoped>
