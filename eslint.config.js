@@ -29,7 +29,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      'vue/html-self-closing': ['error', { html: { void: 'always', normal: 'any' } }],
+      'vue/html-self-closing': ['error', { html: { void: 'always', normal: 'never' } }],
       'vue/script-indent': ['error', 2, { baseIndent: 1 }],
     },
   },
