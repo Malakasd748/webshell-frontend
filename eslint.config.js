@@ -29,12 +29,18 @@ export default tseslint.config(
       },
     },
     rules: {
-      'vue/html-self-closing': ['error', { html: { void: 'always' } }],
+      'vue/html-self-closing': ['error', { html: { void: 'always', normal: 'any' } }],
+      'vue/script-indent': ['error', 2, { baseIndent: 1 }],
     },
   },
   {
     files: ['eslint.config.js'],
     extends: [tseslint.configs.disableTypeChecked],
   },
-  stylistic.configs['recommended-flat'],
+  {
+    extends: [stylistic.configs['recommended-flat']],
+    rules: {
+      '@stylistic/indent': 'off',
+    },
+  },
 )
