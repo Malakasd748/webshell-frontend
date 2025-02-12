@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 
 import { HpcResource, type HpcResourceInit } from '@/models/hpcResource'
-import { useWebshellTermStore } from '@/stores/webShellTerm'
+import { useWebShellTermStore } from '@/stores/webShellTerm'
 
 interface Message {
   action: string
@@ -21,7 +21,7 @@ export function setupWebshell() {
   useEventListener(window, 'message', (ev: { data?: { webshell?: Message } }) => {
     if (!ev.data?.webshell) return
 
-    const termStore = useWebshellTermStore()
+    const termStore = useWebShellTermStore()
 
     const { action, data } = ev.data.webshell
     if (action === 'open') {

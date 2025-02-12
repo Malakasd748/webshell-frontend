@@ -1,7 +1,7 @@
 <template>
   <NPopselect
     v-bind="props"
-    v-model:value="resourceStore.selectedResourceId"
+    v-model:value="selectedResourceId"
     :options="options"
     @update:value="(id) => termStore.addTerm(id)"
   >
@@ -19,18 +19,23 @@
   import { computed } from 'vue'
   import { NPopselect, popselectProps, NSpin, NEmpty } from 'naive-ui'
 
-  import { useWebshellResourceStore } from '../stores/resource'
-  import { useWebshellTermStore } from '../stores/term'
-  import { webshellNotifyOpenerReady, setupWebshell } from '../windowMessage'
+  import { useWebShellResourceStore } from '@/stores/webShellResource'
+  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import { webshellNotifyOpenerReady, setupWebshell } from '@/utils/webShell/windowMessage'
 
   const props = defineProps(popselectProps)
 
-  const resourceStore = useWebshellResourceStore()
-  const termStore = useWebshellTermStore()
+  const resourceStore = useWebShellResourceStore()
+  const termStore = useWebShellTermStore()
 
-  if (resourceStore.resources.length === 0) {
-    resourceStore.fetchResources()
-  }
+  const selectedResourceId = computed({
+    get: () => resourceStore.selectedResource?.id,
+    set: (id) => {
+      if (id !== undefined) {
+        resourceStore.selectResourceById(id)
+      }
+    },
+  })
 
   const options = computed(() =>
     resourceStore.resources.map(r => ({ label: r.name, value: r.id })),

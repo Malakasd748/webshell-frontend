@@ -28,9 +28,9 @@
   import type { SelectOption } from 'naive-ui'
 
   import ThemePreviewGroup from './ThemePreviewGroup.vue'
-  import { useWebShellSettingsStore } from '@/stores/webShellSettings'
+  import { useWebShellSettingStore } from '@/stores/webShellSettings'
 
-  const settingsStore = useWebShellSettingsStore()
+  const settingsStore = useWebShellSettingStore()
 
   const fontSizeOptions = (function () {
     const ret: SelectOption[] = []

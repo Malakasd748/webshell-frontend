@@ -16,10 +16,10 @@
   import { NSpin } from 'naive-ui'
 
   import type { Term } from '@/xterm'
-  import { useWebShellSettingsStore } from '@/stores/webShellSettings'
+  import { useWebShellSettingStore } from '@/stores/webShellSettings'
   import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
-  const settingsStore = useWebShellSettingsStore()
+  const settingsStore = useWebShellSettingStore()
 
   const { term } = defineProps<{
     term: Term

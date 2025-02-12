@@ -93,7 +93,7 @@
 
   import ChatButton from './ChatButton.vue'
   import { useWebShellStateStore } from '../stores/webShellStates'
-  import { useWebshellTermStore } from '../stores/webShellTerm'
+  import { useWebShellTermStore } from '../stores/webShellTerm'
   import TermBody from '@/components/webShell/TermBody'
   import TermFooter from '@/components/webShell/TermFooter'
   import { Term } from '../xterm'
@@ -110,7 +110,7 @@
   const settingsTabSelected = computed(() => activeTab.value === 'settings')
 
   const stateStore = useWebShellStateStore()
-  const terms = useWebshellTermStore().terms
+  const terms = useWebShellTermStore().terms
 
   Term.registerNewTermCallback((t) => {
     setTimeout(() => (activeTab.value = t.id), 10)

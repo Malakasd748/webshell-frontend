@@ -38,11 +38,11 @@
   import { FitAddon } from '@xterm/addon-fit'
   import { useElementHover } from '@vueuse/core'
 
-  import { availableThemes, useWebShellSettingsStore } from '@/stores/webShellSettings'
+  import { availableThemes, useWebShellSettingStore } from '@/stores/webShellSettings'
 
   const { themeName } = defineProps<{ themeName: string }>()
 
-  const settingsStore = useWebShellSettingsStore()
+  const settingsStore = useWebShellSettingStore()
 
   const terminalContainer = useTemplateRef('terminal-container')
   const cardContainer = useTemplateRef('card-container')

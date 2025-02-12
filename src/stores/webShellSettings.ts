@@ -9,7 +9,7 @@ export const availableThemes: Record<string, ITheme> = pick(
   ['Argonaut', 'Atom', 'Homebrew', 'Solarized Dark', 'Ayu', 'Dracula'],
 )
 
-export const useWebShellSettingsStore = defineStore('webshell-settings', () => {
+export const useWebShellSettingStore = defineStore('webshell-settings', () => {
   const themeName = ref('Atom')
   const fontSize = ref(14)
 

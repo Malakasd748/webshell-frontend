@@ -3,7 +3,7 @@ import { useModal } from 'naive-ui'
 
 import { UploadService } from '../webSocketBase/uploadService'
 import type { UploadSession, DuplicatePolicy } from '../webSocketBase/uploadService'
-import type { WebShellWSManager } from './webshellWSManager'
+import type { WebShellWSManager } from './webShellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 
 // 利用 TypeScript 的声明合并，扩展 WebshellWSManager 的事件类型
