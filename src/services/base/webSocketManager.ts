@@ -1,4 +1,4 @@
-import { CacheMap } from '@/utils/cachemap'
+import { CacheMap } from '@/utils/cacheMap'
 import type { WebSocketService } from './webSocketServiceBase'
 
 export interface Message<Action = string, Data = unknown> {
