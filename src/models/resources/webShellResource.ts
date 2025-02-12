@@ -1,16 +1,16 @@
-import type { WebshellWSManager } from '../services/webShell/webshellWSManager'
+import type { WebshellWSManager } from '../../services/webShell/webshellWSManager'
 
-export interface WebshellResourceInit {
+export interface WebShellResourceInit {
   name: string
   wsUrl?: string
 }
 
-export abstract class WebshellResource {
+export abstract class WebShellResource {
   readonly name: string
   manager?: WebshellWSManager
   protected wsUrl?: string
 
-  constructor(r: WebshellResourceInit) {
+  constructor(r: WebShellResourceInit) {
     this.name = r.name
     this.wsUrl = r.wsUrl
   }

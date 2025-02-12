@@ -4,7 +4,7 @@ import { WebshellFSService } from './webShellFSService'
 import { UploadService } from '../webSocketBase/uploadService'
 import { useWebshellUploadStore } from '@/stores/webShellUpload'
 import type { UploadSession } from '../webSocketBase/uploadService'
-import { WebshellResource } from '@/models/webshellResource'
+import { WebShellResource } from '@/models/resources/webShellResource'
 
 // 允许服务扩展 WebSocketManager 的事件类型
 export interface WebshellWSManagerEventMap extends WebSocketManagerEventMap {}
@@ -24,7 +24,7 @@ export class WebshellWSManager extends WebSocketManager {
   readonly fsService: WebshellFSService
   readonly uploadService: UploadService
 
-  constructor(url: string | URL, readonly resource: Readonly<WebshellResource>) {
+  constructor(url: string | URL, readonly resource: Readonly<WebShellResource>) {
     super(url)
 
     this.ptyService = new WebshellPTYService(this)
