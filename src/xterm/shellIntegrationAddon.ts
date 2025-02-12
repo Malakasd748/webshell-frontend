@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import type { ITerminalAddon, IDisposable, IBuffer } from '@xterm/xterm'
 
 import type { Term } from '.'
@@ -264,7 +265,7 @@ export class ShellIntegrationAddon implements ITerminalAddon {
 
     const [command] = data.split(';')
 
-    switch (command as ITermOscPt) {
+    switch (command) {
       case ITermOscPt.SetMark: {
         // 获取当前光标所在行
         const line = this._buffer.cursorY

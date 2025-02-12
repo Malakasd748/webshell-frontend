@@ -49,7 +49,7 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
       if (!success) return
 
       for (const term of this.terms.values()) {
-        this.startPty(term)
+        void this.startPty(term)
       }
     })
   }
@@ -80,18 +80,18 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   }
 
   override dispose(): void {
-    this.disposables.forEach(d => d.dispose)
+    this.disposables.forEach(d => d.dispose())
   }
 
-  override handleAction(action: string, id: string, data: any): void {
+  override handleAction(action: PTYAction, id: string, data: PTYActionMap[typeof action]['response']): void {
     switch (action) {
       case PTYAction.Command:
-        this.handleCommand(id, data)
+        this.handleCommand(id, data as string)
         break
     }
   }
 
-  private handleCommand(id: string, data: PTYActionMap['command']['response']) {
+  private handleCommand(id: string, data: string) {
     const term = this.terms.get(id)
     if (!term) return
 
@@ -101,7 +101,7 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   private async startPty(term: Term) {
     await this.request(term.id, PTYAction.Start, { cwd: '' })
     term.fit()
-    this.notify(term.id, PTYAction.Resize, { cols: term.cols, rows: term.rows })
+    void this.notify(term.id, PTYAction.Resize, { cols: term.cols, rows: term.rows })
   }
 
   addTerm(term: Term) {
@@ -109,27 +109,28 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
 
     this.disposables.push(
       term.onData((data) => {
-        this.notify(term.id, PTYAction.Command, data)
+        void this.notify(term.id, PTYAction.Command, data)
       }),
     )
     this.disposables.push(
       term.onResize((data) => {
-        this.notify(term.id, PTYAction.Resize, data)
+        void this.notify(term.id, PTYAction.Resize, data)
       }),
     )
 
     if (this.manager.ws.readyState === WebSocket.CONNECTING) {
-      this.manager.ws.addEventListener('open', () => this.startPty(term), { once: true })
+      const startPtyHandler = () => void this.startPty(term)
+      this.manager.ws.addEventListener('open', startPtyHandler, { once: true })
     }
     else if (this.manager.ws.readyState === WebSocket.OPEN) {
-      this.startPty(term)
+      void this.startPty(term)
     }
   }
 
   removeTerm(term: Term) {
     if (!this.terms.delete(term.id)) return
 
-    this.notify(term.id, PTYAction.Terminate, undefined)
+    void this.notify(term.id, PTYAction.Terminate, undefined)
     if (this.terms.size === 0) {
       this.manager.ws.close()
     }
