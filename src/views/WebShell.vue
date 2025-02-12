@@ -92,7 +92,7 @@
   import { computed, ref, useTemplateRef, watchEffect } from 'vue'
 
   import ChatButton from './ChatButton.vue'
-  import { useWebshellStateStore } from '../stores/webShellStates'
+  import { useWebShellStateStore } from '../stores/webShellStates'
   import { useWebshellTermStore } from '../stores/webShellTerm'
   import TermBody from '@/components/webShell/TermBody'
   import TermFooter from '@/components/webShell/TermFooter'
@@ -109,7 +109,7 @@
   const siderCollapsed = ref(false)
   const settingsTabSelected = computed(() => activeTab.value === 'settings')
 
-  const stateStore = useWebshellStateStore()
+  const stateStore = useWebShellStateStore()
   const terms = useWebshellTermStore().terms
 
   Term.registerNewTermCallback((t) => {
