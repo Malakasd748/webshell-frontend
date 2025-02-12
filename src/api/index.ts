@@ -1,4 +1,5 @@
-import Axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
+import Axios from 'axios'
+import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
 
 interface RetryConfig {
   retry: number
@@ -146,4 +147,4 @@ const defaultService = new AxiosService('/api', {
   },
 })
 
-export const axios = defaultService.getInstance()
+export default defaultService.getInstance()
