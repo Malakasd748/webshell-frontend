@@ -18,7 +18,7 @@
           设置
         </NTab>
         <NTab
-          v-for="(t, i) in terms"
+          v-for="t in terms"
           :key="t.id"
           :ref="(inst: any) => (tabRefs[t.id] = inst?.$el)"
           :name="t.id"
@@ -26,37 +26,31 @@
         >
           {{ TermManagerRegistry.getManager(t)?.resource.name }}
 
-          <DefaultButton
+          <NButton
             text
-            :quaternary="false"
-            @click="
-              delete tabRefs[t.id]
-            // webshellStore.removeTerm(i);
-            "
+            quaternary
+            :focusable="false"
+            size="tiny"
+            @click="removeTab(t)"
           >
             <div class="i-ant-design:close-outlined"></div>
-          </DefaultButton>
+          </NButton>
         </NTab>
       </NTabs>
     </NScrollbar>
 
     <ResourcePopselect>
-      <DefaultButton
+      <NButton
         class="tab-bar-btn"
+        quaternary
+        :focusable="false"
+        size="tiny"
         :loading="false"
-        @click="webshellResourceStore.selectedResourceId && webshellTermStore.addTerm()"
+        @click="webshellTermStore.addTerm()"
       >
         <div class="i-ant-design:plus-outlined tab-bar-icon"></div>
-      </DefaultButton>
+      </NButton>
     </ResourcePopselect>
-
-    <!-- 本地开发使用 -->
-    <DefaultButton>
-      <div
-        class="i-ant-design:api-outlined tab-bar-icon"
-        @click="webshellTermStore.addTerm(new LocalhostResource({ name: 'localhost' }))"
-      ></div>
-    </DefaultButton>
 
     <!--
     <NTooltip>
@@ -80,23 +74,29 @@
     <NTooltip v-if="!webshellStateStore.isFullscreen">
       全屏
       <template #trigger>
-        <DefaultButton
+        <NButton
           class="tab-bar-btn ml-auto"
+          quaternary
+          :focusable="false"
+          size="tiny"
           @click="emit('enter-fullscreen')"
         >
           <div class="i-ant-design:fullscreen-outlined tab-bar-icon"></div>
-        </DefaultButton>
+        </NButton>
       </template>
     </NTooltip>
     <NTooltip v-else>
       退出全屏
       <template #trigger>
-        <DefaultButton
+        <NButton
           class="tab-bar-btn ml-auto"
+          quaternary
+          :focusable="false"
+          size="tiny"
           @click="emit('quit-fullscreen')"
         >
           <div class="i-ant-design:fullscreen-exit-outlined tab-bar-icon"></div>
-        </DefaultButton>
+        </NButton>
       </template>
     </NTooltip>
     <!--
@@ -123,34 +123,24 @@
     <NDivider vertical />
 
     <div class="i-ant-design:user-outlined tab-bar-icon mx-2"></div>
-    <div> {{ userStore.getUserInfo.username }} </div>
+    <div>user</div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { watch } from 'vue'
-  import { NTabs, NTab, NTooltip, NDivider, NScrollbar } from 'naive-ui'
+  import { NTabs, NTab, NTooltip, NDivider, NScrollbar, NButton } from 'naive-ui'
 
-  import type { Term } from '../xterm'
-  import { useUserStore } from '@/store/modules/user'
   import ResourcePopselect from './ResourcePopselect.vue'
-  import DefaultButton from '../DefaultButton.vue'
-  import { useWebshellTermStore } from '../stores/term'
-  import { useWebshellStateStore } from '../stores/states'
-  import { useWebshellResourceStore } from '../stores/resource'
-  import { TermManagerRegistry } from '../termManagerRegistry'
-  import { LocalhostResource } from './localHostResource'
+  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import { useWebShellStateStore } from '@/stores/webShellStates'
+  import { TermManagerRegistry } from '@/services/termManagerRegistry'
+  import type { Term } from '@/xterm'
 
-  const userStore = useUserStore()
-  const webshellStateStore = useWebshellStateStore()
-  const webshellResourceStore = useWebshellResourceStore()
-  const webshellTermStore = useWebshellTermStore()
+  const webshellStateStore = useWebShellStateStore()
+  const webshellTermStore = useWebShellTermStore()
 
-  const terms = webshellTermStore.terms as Term[]
-
-  if (!userStore.getUserInfo) {
-    window.location.href = '/login'
-  }
+  const terms = webshellTermStore.terms
 
   const activeTab = defineModel<string | undefined>('activeTab', { required: true })
   const emit = defineEmits<{
@@ -171,6 +161,11 @@
     const el = tabRefs[activeTab]
     el?.scrollIntoView({ behavior: 'smooth' })
   })
+
+  function removeTab(term: Term) {
+    delete tabRefs[term.id]
+    webshellTermStore.removeTerm(term)
+  }
 </script>
 
 <style scoped>
