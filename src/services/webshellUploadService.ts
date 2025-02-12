@@ -1,5 +1,5 @@
 import { h } from 'vue'
-import { Modal } from 'ant-design-vue'
+import { useModal } from 'naive-ui'
 
 import { UploadService } from './base/uploadService'
 import type { UploadSession, DuplicatePolicy } from './base/uploadService'
@@ -28,9 +28,11 @@ export class WebshellUploadService extends UploadService {
 
 function doConfirm(session: UploadSession) {
   return new Promise<DuplicatePolicy>((resolve, reject) => {
-    const { destroy } = Modal.warning({
+    const modal = useModal()
+    const { destroy } = modal.create({
       title: '目标路径已存在',
       content: `${session.path} 已存在，是否继续操作？`,
+      preset: 'dialog',
       closable: true,
       footer: () =>
         h(ConfirmActions, {
@@ -47,8 +49,8 @@ function doConfirm(session: UploadSession) {
             destroy()
           },
         }),
-      onCancel() {
-        reject()
+      onClose() {
+        reject(new Error())
       },
     })
   })
