@@ -59,29 +59,37 @@ onMounted(() => {
     rows: 6,
     cols: 44,
     disableStdin: true,
+  const demoText = `\x1b[37mNormal Text \x1b[0m\x1b[1mBold\x1b[0m \x1b[3mItalic\x1b[0m
+\x1b[31mRed \x1b[32mGreen \x1b[33mYellow \x1b[34mBlue\x1b[0m
+\x1b[35mMagenta \x1b[36mCyan \x1b[37mWhite\x1b[0
+\x1b[1m\x1b[31mBold Red\x1b[0m \x1b[1m\x1b[34mBold Blue\x1b[0m
+[user@server ~]$ ls -l
+\x1b[1;34mDocuments\x1b[0m  \x1b[1;32mscript.sh\x1b[0m  \x1b[1;31merror.log\x1b[0m`
+
+  onMounted(() => {
+    const t = new Terminal({
+      theme,
+      rows: 6,
+      cols: 44,
+      disableStdin: true,
+    })
+    t.open(terminalContainer.value as HTMLDivElement)
+    t.write(demoText)
+
+    t.element!.style.padding = '12px 16px'
+
+    const fitAddon = new FitAddon()
+    t.loadAddon(fitAddon)
+
+    watch(
+      () => settingsStore.fontSize,
+      (fontSize) => {
+        t.options = { fontSize }
+        fitAddon.fit()
+      },
+      { immediate: true },
+    )
   })
-  t.open(terminalContainer.value)
-  t.write(`\x1b]0;user@cn1:~\x07[user@cn1 ~]$ ll\r
-drwx------ 4 user  \x1b[0m\x1b[01;34m.\x1b[0m\r
-drwxr-xr-x 3 root  \x1b[01;34m..\x1b[0m\r
--rw------- 1 user  .bashrc\r
-drwx------ 2 user  \x1b[01;34m.ssh\x1b[0m\r
-drwxr-xr-x 2 user  \x1b[01;34m.trash\x1b[0m\r`)
-
-  t.element!.style.padding = '12px 16px'
-
-  const fitAddon = new FitAddon()
-  t.loadAddon(fitAddon)
-
-  watch(
-    () => settingsStore.fontSize,
-    (fontSize) => {
-      t.options = { fontSize }
-      fitAddon.fit()
-    },
-    { immediate: true },
-  )
-})
 </script>
 
 <style scoped>
