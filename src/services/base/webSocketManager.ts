@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { CacheMap } from '@/utils/cacheMap'
 import type { WebSocketService } from './webSocketServiceBase'
 
@@ -11,7 +12,7 @@ export interface Message<Action = string, Data = unknown> {
 
 class PromiseMap<T = unknown> extends CacheMap<
   `${string}:${string}:${string}`,
-  { resolve(val: T): void, reject(err?: any): void }
+  { resolve(this: void, val: T): void, reject(this: void, err?: unknown): void }
 > {}
 
 export interface WebSocketManagerEventMap {
@@ -49,7 +50,7 @@ export abstract class WebSocketManager extends EventTarget {
   }
 
   private setupWebSocket(ws: WebSocket) {
-    ws.addEventListener('message', (event) => {
+    ws.addEventListener('message', (event: MessageEvent<string>) => {
       const message = JSON.parse(event.data) as Message
       const key = `${message.service}:${message.action}:${message.id}` as const
       const promise = this.promiseMap.get(key)
@@ -97,7 +98,7 @@ export abstract class WebSocketManager extends EventTarget {
       if (newSocket.readyState === WebSocket.CONNECTING) {
         await new Promise<void>((resolve, reject) => {
           newSocket.addEventListener('open', () => resolve(), { once: true })
-          newSocket.addEventListener('error', e => reject(e), { once: true })
+          newSocket.addEventListener('error', () => reject(new Error('websocket error')), { once: true })
         })
       }
 
@@ -117,7 +118,7 @@ export abstract class WebSocketManager extends EventTarget {
     if (this._ws.readyState === WebSocket.CONNECTING) {
       await new Promise<void>((resolve, reject) => {
         this._ws.addEventListener('open', () => resolve(), { once: true })
-        this._ws.addEventListener('error', e => reject(e), { once: true })
+        this._ws.addEventListener('error', () => reject(new Error('websocket error')), { once: true })
       })
       this._ws.send(message)
       return
@@ -156,7 +157,7 @@ export abstract class WebSocketManager extends EventTarget {
 
   request<A extends string, Req, Res>(message: Message<A, Req>): Promise<Res>
   request<A extends string, Req, Res>(message: Message<A, Req>, noResponse: false): Promise<Res>
-  request<A extends string, Req, Res>(message: Message<A, Req>, noResponse: true): Promise<void>
+  request<A extends string, Req, _Res>(message: Message<A, Req>, noResponse: true): Promise<void>
   /** Associate request with response */
   async request<A extends string, Req, Res>(
     message: Message<A, Req>,
@@ -179,7 +180,7 @@ export abstract class WebSocketManager extends EventTarget {
           reject,
         })
 
-        this.sendWithReconnect(JSON.stringify(message))
+        void this.sendWithReconnect(JSON.stringify(message))
 
         setTimeout(() => reject(new Error(`Request timeout: ${key}`)), this.promiseMap.ttl)
       })

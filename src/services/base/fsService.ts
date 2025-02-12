@@ -101,7 +101,6 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
   }
 
   async create(parent: Node, isDir: boolean, name: string) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
     await this.request(join(parent.path, name), FSAction.Create, { name, isDir })
     await this.getChildren(parent)
   }

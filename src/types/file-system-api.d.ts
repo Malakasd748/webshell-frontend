@@ -15,7 +15,7 @@ interface DirectoryPickerOptions {
 }
 
 interface FileSystemDirectoryHandle {
-  values(): AsyncGenerator<FileSystemHandle>
+  values(): AsyncGenerator<FileSystemHandle, FileSystemHandle, void>
 }
 
 interface Window {

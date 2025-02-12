@@ -19,7 +19,7 @@ export class Term extends Terminal implements PTYTerminal {
   fit() {
     this.fitAddon.fit()
   }
-  
+
   get cwd() {
     return this.shellIntegrationAddon.cwd
   }

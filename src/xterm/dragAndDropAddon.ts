@@ -40,7 +40,7 @@ export class DragAndDropAddon implements ITerminalAddon {
       if (!entry) {
         continue
       }
-      this.service.dropUpload(entry, this.terminal.cwd || 'temp/')
+      void this.service.dropUpload(entry, this.terminal.cwd || 'temp/')
     }
   }
 }

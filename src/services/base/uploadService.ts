@@ -75,13 +75,14 @@ export class UploadService extends WebSocketService {
     this.sessionList = []
   }
 
-  dropUpload(entry: FileSystemEntry, dest: string) {
+  async dropUpload(entry: FileSystemEntry, dest: string) {
     if (entry instanceof FileSystemFileEntry) {
-      return this.dropFileUpload(entry, dest)
+      await this.dropFileUpload(entry, dest)
     }
     else if (entry instanceof FileSystemDirectoryEntry) {
-      return this.dropDirectoryUpload(entry, dest)
+      await this.dropDirectoryUpload(entry, dest)
     }
+    throw new TypeError('invalid parameter')
   }
 
   private async dropFileUpload(entry: FileSystemFileEntry, dest: string) {
@@ -96,42 +97,35 @@ export class UploadService extends WebSocketService {
     await this.startUpload(session)
   }
 
-  dialogUpload(type: 'file' | 'directory', dest: string) {
+  async dialogUpload(type: 'file' | 'directory', dest: string) {
     if (type === 'file') {
       if ('showOpenFilePicker' in window) {
-        return this.filePickerUpload(dest)
+        await this.filePickerUpload(dest)
       }
       else {
-        return this.inputFileUpload(dest)
+        await this.inputFileUpload(dest)
       }
     }
     else if (type === 'directory') {
       if ('showDirectoryPicker' in window) {
-        return this.directoryPickerUpload(dest)
+        await this.directoryPickerUpload(dest)
       }
       else {
-        return this.inputDirectoryUpload(dest)
+        await this.inputDirectoryUpload(dest)
       }
     }
+    throw new TypeError('invalid parameter')
   }
 
-  private async filePickerUpload(dest: string) {
+  private async filePickerUpload(dest: string): Promise<void> {
     const handles = await window.showOpenFilePicker({ multiple: true, id: 'upload-file' })
-    return new Promise<void>(async (resolve, reject) => {
-      const promises: Promise<void>[] = []
-      try {
-        for (const handle of handles) {
-          const session = new UploadSession(this, 'file', handle.name, dest)
-          await session.setup(handle)
-          promises.push(this.startUpload(session))
-        }
-        await Promise.all(promises)
-        resolve()
-      }
-      catch (err) {
-        reject(err)
-      }
-    })
+    const promises: Promise<void>[] = []
+    for (const handle of handles) {
+      const session = new UploadSession(this, 'file', handle.name, dest)
+      await session.setup(handle)
+      promises.push(this.startUpload(session))
+    }
+    await Promise.all(promises)
   }
 
   private async directoryPickerUpload(dest: string) {
@@ -161,7 +155,7 @@ export class UploadService extends WebSocketService {
           resolve()
         }
         catch (err) {
-          reject(err)
+          reject(err as Error)
         }
       }
       input.click()
@@ -220,8 +214,6 @@ export class UploadService extends WebSocketService {
       // 空文件夹，创建路径就行了
       if (entry.isDir) {
         await this.request(session.path, UploadAction.Mkdir, entry.path)
-        if (!session.setupFinished) {
-        }
         continue
       }
 
@@ -252,13 +244,13 @@ export class UploadService extends WebSocketService {
 
       while (true) {
         if (session.status === 'cancelled') {
-          reader.cancel()
+          void reader.cancel()
           await this.request(session.path, UploadAction.CancelSession, undefined)
           return
         }
         const { done, value } = await reader.read()
         if (done) {
-          reader.cancel()
+          void reader.cancel()
           session.doneFilesCount += 1
           session.doneSize += entry.file.size
 
@@ -296,7 +288,7 @@ type UploadEntry = { path: string, isDir: true } | { path: string, isDir: false,
 export class UploadSession {
   readonly path: string
   resolveConfirm(_p: DuplicatePolicy) {}
-  rejectConfirm(_reason?: any) {}
+  rejectConfirm(_reason?: unknown) {}
 
   /** 文件夹任务--当前正在上传的文件名 */
   currentFileRelativePath?: string
@@ -425,8 +417,9 @@ export class UploadSession {
     this._entries.push({ path, isDir: false, file })
   }
 
-  private async setupFile(file: File) {
+  private setupFile(file: File) {
     this.countFile(join(this.dest, file.name), file)
+    return Promise.resolve()
   }
 
   private async setupFileList(files: FileList) {
