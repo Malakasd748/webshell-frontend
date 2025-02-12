@@ -29,7 +29,7 @@
               :focusable="false"
               @click="uploadStore.clearIdleSessions()"
             >
-              <div class="i-ant-design:clear-outlined size-3.5" />
+              <div class="i-ant-design:clear-outlined size-3.5"></div>
             </NButton>
           </template>
         </NTooltip>
@@ -43,7 +43,7 @@
               :focusable="false"
               @click="emit('hide-clicked')"
             >
-              <div class="i-ant-design:down-outlined size-3.5" />
+              <div class="i-ant-design:down-outlined size-3.5"></div>
             </NButton>
           </template>
         </NTooltip>
@@ -68,22 +68,22 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
-import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui'
+  import { useTemplateRef } from 'vue'
+  import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui'
 
-import UploadListItem from './UploadListItem.vue'
-import { useWebshellUploadStore } from '../stores/upload'
+  import UploadListItem from './UploadListItem.vue'
+  import { useWebshellUploadStore } from '../stores/upload'
 
-defineOptions({ inheritAttrs: false })
+  defineOptions({ inheritAttrs: false })
 
-const uploadStore = useWebshellUploadStore()
+  const uploadStore = useWebshellUploadStore()
 
-const { dark = false } = defineProps<{ dark?: boolean }>()
-const emit = defineEmits<{
-  (e: 'hide-clicked')
-}>()
+  const { dark = false } = defineProps<{ dark?: boolean }>()
+  const emit = defineEmits<{
+    (e: 'hide-clicked')
+  }>()
 
-const sessions = uploadStore.sessions
+  const sessions = uploadStore.sessions
 </script>
 
 <style scoped></style>

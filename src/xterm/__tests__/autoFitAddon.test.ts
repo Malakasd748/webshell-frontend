@@ -66,12 +66,12 @@ describe('AutoFitAddon', () => {
     })
 
     addon.activate(terminal as any)
-    
+
     // 快速连续调用 fit 三次
     addon.fit()
     addon.fit()
     addon.fit()
-    
+
     // 运行所有计时器来触发防抖的回调
     vi.runAllTimers()
 

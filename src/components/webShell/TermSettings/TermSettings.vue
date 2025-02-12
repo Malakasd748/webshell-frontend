@@ -24,22 +24,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watchEffect } from 'vue'
-import { NSelect } from 'naive-ui'
-import type { SelectOption } from 'naive-ui'
+  import { NSelect } from 'naive-ui'
+  import type { SelectOption } from 'naive-ui'
 
-import ThemePreviewGroup from './ThemePreviewGroup.vue'
-import { useWebshellSettingsStore } from '../stores/settings'
+  import ThemePreviewGroup from './ThemePreviewGroup.vue'
+  import { useWebShellSettingsStore } from '@/stores/webShellSettings'
 
-const settingsStore = useWebshellSettingsStore()
+  const settingsStore = useWebShellSettingsStore()
 
-const fontSizeOptions = (function () {
-  const ret: SelectOption[] = []
-  for (let i = 12; i <= 30; i += 2) {
-    ret.push({ label: i.toString(), value: i })
-  }
-  return ret
-})()
+  const fontSizeOptions = (function () {
+    const ret: SelectOption[] = []
+    for (let i = 12; i <= 30; i += 2) {
+      ret.push({ label: i.toString(), value: i })
+    }
+    return ret
+  })()
 </script>
 
 <style scoped></style>

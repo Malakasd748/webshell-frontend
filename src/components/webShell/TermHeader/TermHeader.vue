@@ -14,7 +14,7 @@
           name="settings"
           style="width: 100px; gap: 8px"
         >
-          <div class="i-ant-design:setting-outlined" />
+          <div class="i-ant-design:setting-outlined"></div>
           设置
         </NTab>
         <NTab
@@ -34,7 +34,7 @@
             // webshellStore.removeTerm(i);
             "
           >
-            <div class="i-ant-design:close-outlined" />
+            <div class="i-ant-design:close-outlined"></div>
           </DefaultButton>
         </NTab>
       </NTabs>
@@ -46,7 +46,7 @@
         :loading="false"
         @click="webshellResourceStore.selectedResourceId && webshellTermStore.addTerm()"
       >
-        <div class="i-ant-design:plus-outlined tab-bar-icon" />
+        <div class="i-ant-design:plus-outlined tab-bar-icon"></div>
       </DefaultButton>
     </ResourcePopselect>
 
@@ -55,7 +55,7 @@
       <div
         class="i-ant-design:api-outlined tab-bar-icon"
         @click="webshellTermStore.addTerm(new LocalhostResource({ name: 'localhost' }))"
-      />
+      ></div>
     </DefaultButton>
 
     <!--
@@ -84,7 +84,7 @@
           class="tab-bar-btn ml-auto"
           @click="emit('enter-fullscreen')"
         >
-          <div class="i-ant-design:fullscreen-outlined tab-bar-icon" />
+          <div class="i-ant-design:fullscreen-outlined tab-bar-icon"></div>
         </DefaultButton>
       </template>
     </NTooltip>
@@ -95,7 +95,7 @@
           class="tab-bar-btn ml-auto"
           @click="emit('quit-fullscreen')"
         >
-          <div class="i-ant-design:fullscreen-exit-outlined tab-bar-icon" />
+          <div class="i-ant-design:fullscreen-exit-outlined tab-bar-icon"></div>
         </DefaultButton>
       </template>
     </NTooltip>
@@ -122,55 +122,55 @@
 
     <NDivider vertical />
 
-    <div class="i-ant-design:user-outlined tab-bar-icon mx-2" />
+    <div class="i-ant-design:user-outlined tab-bar-icon mx-2"></div>
     <div> {{ userStore.getUserInfo.username }} </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
-import { NTabs, NTab, NTooltip, NDivider, NScrollbar } from 'naive-ui'
+  import { watch } from 'vue'
+  import { NTabs, NTab, NTooltip, NDivider, NScrollbar } from 'naive-ui'
 
-import type { Term } from '../xterm'
-import { useUserStore } from '@/store/modules/user'
-import ResourcePopselect from './ResourcePopselect.vue'
-import DefaultButton from '../DefaultButton.vue'
-import { useWebshellTermStore } from '../stores/term'
-import { useWebshellStateStore } from '../stores/states'
-import { useWebshellResourceStore } from '../stores/resource'
-import { TermManagerRegistry } from '../termManagerRegistry'
-import { LocalhostResource } from './localHostResource'
+  import type { Term } from '../xterm'
+  import { useUserStore } from '@/store/modules/user'
+  import ResourcePopselect from './ResourcePopselect.vue'
+  import DefaultButton from '../DefaultButton.vue'
+  import { useWebshellTermStore } from '../stores/term'
+  import { useWebshellStateStore } from '../stores/states'
+  import { useWebshellResourceStore } from '../stores/resource'
+  import { TermManagerRegistry } from '../termManagerRegistry'
+  import { LocalhostResource } from './localHostResource'
 
-const userStore = useUserStore()
-const webshellStateStore = useWebshellStateStore()
-const webshellResourceStore = useWebshellResourceStore()
-const webshellTermStore = useWebshellTermStore()
+  const userStore = useUserStore()
+  const webshellStateStore = useWebshellStateStore()
+  const webshellResourceStore = useWebshellResourceStore()
+  const webshellTermStore = useWebshellTermStore()
 
-const terms = webshellTermStore.terms as Term[]
+  const terms = webshellTermStore.terms as Term[]
 
-if (!userStore.getUserInfo) {
-  window.location.href = '/login'
-}
-
-const activeTab = defineModel<string | undefined>('activeTab', { required: true })
-const emit = defineEmits<{
-  (e: 'vertical-split'): void
-  (e: 'horizontal-split'): void
-  (e: 'enter-fullscreen'): void
-  (e: 'quit-fullscreen'): void
-  (e: 'common-commands'): void
-  (e: 'documentation'): void
-}>()
-
-const tabRefs: Record<string, HTMLDivElement> = {}
-
-watch(activeTab, (activeTab) => {
-  if (!activeTab) {
-    return
+  if (!userStore.getUserInfo) {
+    window.location.href = '/login'
   }
-  const el = tabRefs[activeTab]
-  el?.scrollIntoView({ behavior: 'smooth' })
-})
+
+  const activeTab = defineModel<string | undefined>('activeTab', { required: true })
+  const emit = defineEmits<{
+    (e: 'vertical-split'): void
+    (e: 'horizontal-split'): void
+    (e: 'enter-fullscreen'): void
+    (e: 'quit-fullscreen'): void
+    (e: 'common-commands'): void
+    (e: 'documentation'): void
+  }>()
+
+  const tabRefs: Record<string, HTMLDivElement> = {}
+
+  watch(activeTab, (activeTab) => {
+    if (!activeTab) {
+      return
+    }
+    const el = tabRefs[activeTab]
+    el?.scrollIntoView({ behavior: 'smooth' })
+  })
 </script>
 
 <style scoped>

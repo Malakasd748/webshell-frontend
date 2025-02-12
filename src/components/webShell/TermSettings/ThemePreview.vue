@@ -19,46 +19,39 @@
     <div
       ref="terminal-container"
       class="rounded-1 w-112 h-34"
-    />
+    ></div>
 
     <template v-if="checked">
       <div
         class="absolute bottom-0 right-0 size-0 border-r-(28px color-primary) border-t-(28px transparent)"
-      />
+      ></div>
       <div
         class="i-ant-design:check-outlined color-white bottom-0.5 right-0.5 absolute size-3"
-      />
+      ></div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, useTemplateRef, onMounted, computed, watch } from 'vue'
-import { Terminal } from '@xterm/xterm'
-import { FitAddon } from '@xterm/addon-fit'
-import { useElementHover } from '@vueuse/core'
+  import { useTemplateRef, onMounted, computed, watch } from 'vue'
+  import { Terminal } from '@xterm/xterm'
+  import { FitAddon } from '@xterm/addon-fit'
+  import { useElementHover } from '@vueuse/core'
 
-import { availableThemes } from '../stores/settings'
-import { useWebshellSettingsStore } from '../stores/settings'
+  import { availableThemes, useWebShellSettingsStore } from '@/stores/webShellSettings'
 
-const { themeName } = defineProps<{ themeName: string }>()
+  const { themeName } = defineProps<{ themeName: string }>()
 
-const settingsStore = useWebshellSettingsStore()
+  const settingsStore = useWebShellSettingsStore()
 
-const terminalContainer = useTemplateRef('terminal-container')
-const cardContainer = useTemplateRef('card-container')
-const cardHovered = useElementHover(cardContainer)
+  const terminalContainer = useTemplateRef('terminal-container')
+  const cardContainer = useTemplateRef('card-container')
+  const cardHovered = useElementHover(cardContainer)
 
-const checked = computed(() => settingsStore.themeName === themeName)
+  const checked = computed(() => settingsStore.themeName === themeName)
 
-const theme = availableThemes[themeName]
+  const theme = availableThemes[themeName]
 
-onMounted(() => {
-  const t = new Terminal({
-    theme,
-    rows: 6,
-    cols: 44,
-    disableStdin: true,
   const demoText = `\x1b[37mNormal Text \x1b[0m\x1b[1mBold\x1b[0m \x1b[3mItalic\x1b[0m
 \x1b[31mRed \x1b[32mGreen \x1b[33mYellow \x1b[34mBlue\x1b[0m
 \x1b[35mMagenta \x1b[36mCyan \x1b[37mWhite\x1b[0

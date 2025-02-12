@@ -4,7 +4,7 @@
     content-class="size-full"
   >
     <div
-      :ref="el => (term.container = el as HTMLElement)"
+      :ref="el => emit('container-change', el as HTMLDivElement)"
       class="contain-strict size-full"
       :style="{ backgroundColor: settingsStore.theme.background }"
     ></div>
@@ -12,17 +12,21 @@
 </template>
 
 <script setup lang="ts">
-  import { watchEffect, ref, computed, watch } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { NSpin } from 'naive-ui'
 
   import type { Term } from '@/xterm'
   import { useWebShellSettingsStore } from '@/stores/webShellSettings'
-  import { TermManagerRegistry } from '../termManagerRegistry'
+  import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
   const settingsStore = useWebShellSettingsStore()
 
   const { term } = defineProps<{
     term: Term
+  }>()
+
+  const emit = defineEmits<{
+    (e: 'container-change', value: HTMLDivElement | null): void
   }>()
 
   const loading = ref(false)
@@ -36,13 +40,6 @@
         loading.value = false
       })
     }
-  })
-
-  watchEffect(() => {
-    term.options.theme = settingsStore.theme
-  })
-  watchEffect(() => {
-    term.options.fontSize = settingsStore.fontSize
   })
 </script>
 

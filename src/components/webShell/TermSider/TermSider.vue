@@ -14,7 +14,7 @@
         size="tiny"
         @click="collapsed = true"
       >
-        <div class="i-ant-design:menu-fold-outlined size-4" />
+        <div class="i-ant-design:menu-fold-outlined size-4"></div>
       </NButton>
 
       <div class="text-base font-semibold ml-2">
@@ -48,7 +48,7 @@
             class="ml-2"
             @click="fileTreeRef?.refresh()"
           >
-            <div class="i-ant-design:redo-outlined size-4" />
+            <div class="i-ant-design:redo-outlined size-4"></div>
           </NButton>
         </template>
       </NTooltip>
@@ -64,20 +64,20 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NLayout, NLayoutHeader, NSwitch, NTooltip } from 'naive-ui'
-import { ref } from 'vue'
+  import { NButton, NLayout, NLayoutHeader, NSwitch, NTooltip } from 'naive-ui'
+  import { ref } from 'vue'
 
-import type { WebshellWSManager } from '../services/webshellWSManager'
-import FileTree from './FileTree'
+  import type { WebshellWSManager } from '../services/webshellWSManager'
+  import FileTree from './FileTree'
 
-const { manager } = defineProps<{
-  manager: WebshellWSManager
-}>()
-const collapsed = defineModel<boolean>('collapsed', { required: true })
+  const { manager } = defineProps<{
+    manager: WebshellWSManager
+  }>()
+  const collapsed = defineModel<boolean>('collapsed', { required: true })
 
-const showHiddenFiles = ref(false)
+  const showHiddenFiles = ref(false)
 
-const fileTreeRef = ref<InstanceType<typeof FileTree>>()
+  const fileTreeRef = ref<InstanceType<typeof FileTree>>()
 </script>
 
 <style scoped></style>

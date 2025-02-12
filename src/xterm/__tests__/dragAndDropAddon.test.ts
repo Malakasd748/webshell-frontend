@@ -20,7 +20,7 @@ class MockUploadService extends UploadService {
     super({} as any, [])
   }
 
-  readonly name = 'upload' as const
+  readonly name = 'upload'
   waitForSetup = false
   dropUpload = vi.fn()
   dialogUpload = vi.fn()
@@ -84,7 +84,7 @@ describe('DragAndDropAddon', () => {
 
   it('should handle drop with temp directory when cwd is not available', () => {
     terminal.cwd = ''
-    
+
     const mockEntry = {
       isFile: true,
       name: 'test.txt',
@@ -123,7 +123,7 @@ describe('DragAndDropAddon', () => {
 
   it('should cleanup event listeners on dispose', () => {
     const removeEventListener = vi.spyOn(terminal.container, 'removeEventListener')
-    
+
     addon.dispose()
 
     expect(removeEventListener).toHaveBeenCalledTimes(2)
