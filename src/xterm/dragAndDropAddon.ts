@@ -30,6 +30,9 @@ export class DragAndDropAddon implements ITerminalAddon {
     if (!ev.dataTransfer) {
       return
     }
+    if (!this.terminal) {
+      return
+    }
 
     const items = ev.dataTransfer.items
     for (const item of items) {
@@ -37,7 +40,7 @@ export class DragAndDropAddon implements ITerminalAddon {
       if (!entry) {
         continue
       }
-      this.service.dropUpload(entry, this.terminal!.shellIntegrationAddon.cwd.value || 'temp/')
+      this.service.dropUpload(entry, this.terminal.cwd || 'temp/')
     }
   }
 }

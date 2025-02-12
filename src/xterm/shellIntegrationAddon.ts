@@ -198,7 +198,7 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     const [command, ...args] = data.split(';')
     const currentLine = this._buffer.cursorY
 
-    switch (command as FinalTermOscPt) {
+    switch (command) {
       case FinalTermOscPt.PromptStart: {
         // 如果有未结束的区域，关闭它
         if (this._currentZone) {

@@ -37,22 +37,22 @@ if (!Element.prototype.checkVisibility) {
  * 自适应终端大小
  */
 export class AutoFitAddon extends FitAddon {
-  private _terminal?: Term
+  private terminal?: Term
 
   override activate(term: Term) {
     super.activate(term)
-    this._terminal = term
+    this.terminal = term
     useResizeObserver(() => term.container, () => this.fit())
   }
 
   override fit = debounce(() => {
-    const container = this._terminal?.container
+    const container = this.terminal?.container
     if (!container?.checkVisibility()) {
       return
     }
 
     super.fit()
 
-    this._terminal?.focus()
+    this.terminal?.focus()
   }, 200)
 }

@@ -12,10 +12,16 @@ import type { PTYTerminal } from '../services/base/ptyService'
 export class Term extends Terminal implements PTYTerminal {
   container: HTMLElement | null = null
   readonly id = String(Date.now())
+
   private fitAddon = new AutoFitAddon()
+  private shellIntegrationAddon = new ShellIntegrationAddon()
 
   fit() {
     this.fitAddon.fit()
+  }
+  
+  get cwd() {
+    return this.shellIntegrationAddon.cwd
   }
 
   private constructor(options?: ITerminalOptions | ITerminalInitOnlyOptions) {
@@ -23,7 +29,7 @@ export class Term extends Terminal implements PTYTerminal {
     super(merge<Option, Option>({ cursorBlink: true }, options ?? {}))
 
     this.loadAddon(this.fitAddon)
-    this.loadAddon(new ShellIntegrationAddon())
+    this.loadAddon(this.shellIntegrationAddon)
     this.loadAddon(new WebLinksAddon())
   }
 
