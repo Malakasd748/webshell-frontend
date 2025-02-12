@@ -2,35 +2,38 @@ import { WebSocketManager, type WebSocketManagerEventMap } from '../webSocketBas
 import { WebshellPTYService } from './webShellPTYService'
 import { WebshellFSService } from './webShellFSService'
 import { UploadService } from '../webSocketBase/uploadService'
-import { useWebshellUploadStore } from '@/stores/webShellUpload'
+import { useWebShellUploadStore } from '@/stores/webShellUpload'
 import type { UploadSession } from '../webSocketBase/uploadService'
 import { WebShellResource } from '@/models/resources/webShellResource'
 
 // 允许服务扩展 WebSocketManager 的事件类型
-export interface WebshellWSManagerEventMap extends WebSocketManagerEventMap {}
+export interface WebShellWSManagerEventMap extends WebSocketManagerEventMap {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface WebshellWSManager {
-  addEventListener<K extends keyof WebshellWSManagerEventMap>(
+export interface WebShellWSManager {
+  addEventListener<K extends keyof WebShellWSManagerEventMap>(
     type: K,
-    listener: (ev: WebshellWSManagerEventMap[K]) => unknown,
+    listener: (ev: WebShellWSManagerEventMap[K]) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): void
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class WebshellWSManager extends WebSocketManager {
+export class WebShellWSManager extends WebSocketManager {
   readonly ptyService: WebshellPTYService
   readonly fsService: WebshellFSService
   readonly uploadService: UploadService
+  readonly resource: Readonly<WebShellResource>
 
-  constructor(url: string | URL, readonly resource: Readonly<WebShellResource>) {
+  constructor(url: string | URL, resource: WebShellResource) {
     super(url)
+    this.resource = resource
+    resource.manager = this
 
     this.ptyService = new WebshellPTYService(this)
     this.fsService = new WebshellFSService(this)
 
-    const uploadSessions = useWebshellUploadStore().sessions
+    const uploadSessions = useWebShellUploadStore().sessions
     this.uploadService = new UploadService(this, uploadSessions as UploadSession[])
 
     this.registerService(this.ptyService)

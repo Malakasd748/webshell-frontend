@@ -1,20 +1,20 @@
 import type { PTYTerminal } from './webSocketBase/ptyService'
-import type { WebshellWSManager } from './webShell/webshellWSManager'
+import type { WebShellWSManager } from './webShell/webshellWSManager'
 import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
-  private static managerMap = new Map<string, WebshellWSManager>()
+  private static managerMap = new Map<string, WebShellWSManager>()
 
   private constructor() {}
 
-  static register(term: PTYTerminal, manager: WebshellWSManager) {
+  static register(term: PTYTerminal, manager: WebShellWSManager) {
     this.managerMap.set(term.id, manager)
 
     term.loadAddon(new DragAndDropAddon(manager.uploadService))
   }
 
-  static getManager(term: PTYTerminal): WebshellWSManager | undefined
-  static getManager(id: string): WebshellWSManager | undefined
+  static getManager(term: PTYTerminal): WebShellWSManager | undefined
+  static getManager(id: string): WebShellWSManager | undefined
   static getManager(termOrId: PTYTerminal | string) {
     if (typeof termOrId === 'string') {
       return this.managerMap.get(termOrId)

@@ -1,9 +1,9 @@
 import { PTYService, type PTYTerminal } from '../webSocketBase/ptyService'
 import { TermManagerRegistry } from '../../termManagerRegistry'
-import { WebshellWSManager } from './webshellWSManager'
+import { WebShellWSManager } from './webshellWSManager'
 
 export class WebshellPTYService extends PTYService {
-  constructor(protected override manager: WebshellWSManager) {
+  constructor(protected override manager: WebShellWSManager) {
     super(manager)
   }
 

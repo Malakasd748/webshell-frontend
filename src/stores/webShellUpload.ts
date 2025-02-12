@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 import type { UploadSession, SessionStatus } from '../services/webSocketBase/uploadService'
 
-export const useWebshellUploadStore = defineStore('webshell-upload', () => {
+export const useWebShellUploadStore = defineStore('webshell-upload', () => {
   const sessions = ref<UploadSession[]>([])
 
   const keepStatuses: SessionStatus[] = ['preparing', 'pending', 'uploading']

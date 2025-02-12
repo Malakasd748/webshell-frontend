@@ -3,12 +3,12 @@ import { useEventListener } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
 import { Term } from '../xterm'
-import { useWebshellResourceStore } from './webShellResource'
-import { WebshellResource } from '../webshellResource'
-import { WebshellWSManager } from '../services/webShell/webshellWSManager'
+import { useWebShellResourceStore } from './webShellResource'
+import { WebShellResource } from '@/models/resources/webShellResource'
+import { WebShellWSManager } from '@/services/webShell/webshellWSManager'
 
 export const useWebshellTermStore = defineStore('webshell-term', () => {
-  const resourceStore = useWebshellResourceStore()
+  const resourceStore = useWebShellResourceStore()
 
   const terms = shallowRef<Term[]>([])
   const lastFocusedTerm = shallowRef<Term>()
@@ -25,24 +25,24 @@ export const useWebshellTermStore = defineStore('webshell-term', () => {
 
   function addTerm(): Promise<void>
   function addTerm(resourceId: string): Promise<void>
-  function addTerm(resource: WebshellResource): Promise<void>
+  function addTerm(resource: WebShellResource): Promise<void>
   async function addTerm(
-    resourceOrId: string | WebshellResource | undefined = resourceStore.activeManager?.resource,
+    resourceOrId: string | WebShellResource | undefined = resourceStore.activeManager?.resource,
   ) {
     if (!resourceOrId) {
       throw new Error('No resource selected')
     }
 
     const resource
-      = resourceOrId instanceof WebshellResource
+      = resourceOrId instanceof WebShellResource
         ? resourceOrId
-        : (resourceStore.resources.find(r => r.id === resourceOrId) as WebshellResource)
-    if (!resource) {
+        : resourceStore.resources.find(r => r.id === resourceOrId)
+    if (resource === undefined) {
       throw new Error('invalid resource id')
     }
 
     const wsUrl = await resource.getWsUrl()
-    const manager = new WebshellWSManager(wsUrl, resource)
+    const manager = new WebShellWSManager(wsUrl, resource)
 
     const term = Term.new()
     manager.ptyService.addTerm(term)

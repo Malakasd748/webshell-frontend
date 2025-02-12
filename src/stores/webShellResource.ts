@@ -2,33 +2,21 @@ import { ref, computed } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
-import { getResourceList } from '@/api/sc_ic/sc'
-import { HpcResource } from '../hpcResource'
+import { LocalhostResource } from '@/models/resources/localhostResource'
 
-export const useWebshellResourceStore = defineStore('webshell-resource', () => {
-  const fetchResources = useAsyncState<HpcResource[]>(
+export const useWebShellResourceStore = defineStore('webshell-resource', () => {
+  const localhostResource = new LocalhostResource({ id: '123', name: 'localhost', port: 1234 })
+  const fetchResources = useAsyncState<LocalhostResource[]>(
     async () => {
-      const { data } = await getResourceList({})
-      if (data.success !== 'yes') {
-        return []
-      }
-
-      return data.results.map(
-        r =>
-          new HpcResource({
-            id: r.id,
-            name: r.resource_name,
-          }),
-      )
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return [localhostResource]
     },
     [],
     { immediate: false },
   )
 
   const selectedResourceId = ref<string>()
-  const activeManager = computed(
-    () => fetchResources.state.value.find(r => r.id === selectedResourceId.value)?.manager,
-  )
+  const activeManager = computed(() => localhostResource.manager)
 
   return {
     resources: fetchResources.state,

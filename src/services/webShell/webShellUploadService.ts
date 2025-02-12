@@ -3,24 +3,24 @@ import { useModal } from 'naive-ui'
 
 import { UploadService } from '../webSocketBase/uploadService'
 import type { UploadSession, DuplicatePolicy } from '../webSocketBase/uploadService'
-import type { WebshellWSManager } from './webshellWSManager'
+import type { WebShellWSManager } from './webshellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 
 // 利用 TypeScript 的声明合并，扩展 WebshellWSManager 的事件类型
-declare module './webshellWSManager' {
-  interface WebshellWSManagerEventMap {
+declare module './webShellWSManager' {
+  interface WebShellWSManagerEventMap {
     'upload-need-confirm': CustomEvent<UploadSession>
   }
 }
 
-export class WebshellUploadService extends UploadService {
-  constructor(manager: WebshellWSManager, sessions: UploadSession[]) {
+export class WebShellUploadService extends UploadService {
+  constructor(manager: WebShellWSManager, sessions: UploadSession[]) {
     super(manager, sessions)
 
     manager.addEventListener('upload-need-confirm', ({ detail: session }) => {
       doConfirm(session).then(
         policy => session.resolveConfirm(policy),
-        () => session.rejectConfirm(),
+        () => session.rejectConfirm(new Error()),
       )
     })
   }
