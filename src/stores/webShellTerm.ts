@@ -59,10 +59,34 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
     terms.value.push(term)
   }
 
+  function removeTerm(term: Term): void
+  function removeTerm(index: number): void
+  function removeTerm(arg: Term | number): void {
+    let index: number
+    let termToDispose: Term
+    if (typeof arg === 'number') {
+      index = arg
+      if (index < 0 || index >= terms.value.length) {
+        return
+      }
+      termToDispose = terms.value[index]
+    } else {
+      index = terms.value.indexOf(arg)
+      if (index === -1) {
+        return
+      }
+      termToDispose = arg
+    }
+
+    terms.value.splice(index, 1)
+    termToDispose.dispose()
+  }
+
   return {
     terms,
     lastFocusedTerm,
 
     addTerm,
+    removeTerm,
   }
 })
