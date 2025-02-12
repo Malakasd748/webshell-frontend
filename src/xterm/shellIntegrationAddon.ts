@@ -103,38 +103,38 @@ interface SemanticZone {
 export class ShellIntegrationAddon implements ITerminalAddon {
   public cwd = ''
 
-  private _terminal?: Term
-  private _buffer?: IBuffer
-  private _disposables: IDisposable[] = []
-  private _currentZone?: SemanticZone
-  private _zones: SemanticZone[] = []
+  private terminal?: Term
+  private buffer?: IBuffer
+  private disposables: IDisposable[] = []
+  private currentZone?: SemanticZone
+  private zones: SemanticZone[] = []
 
   activate(terminal: Term): void {
-    this._terminal = terminal
-    this._buffer = terminal.buffer.normal
+    this.terminal = terminal
+    this.buffer = terminal.buffer.normal
 
-    this._disposables.push(
+    this.disposables.push(
       terminal.parser.registerOscHandler(ShellIntegrationOscPs.FinalTerm, data =>
-        this._handleFinalTermSequence(data),
+        this.handleFinalTermSequence(data),
       ),
     )
-    this._disposables.push(
+    this.disposables.push(
       terminal.parser.registerOscHandler(ShellIntegrationOscPs.ITerm, data =>
-        this._handleITermSequence(data),
+        this.handleITermSequence(data),
       ),
     )
-    this._disposables.push(
+    this.disposables.push(
       terminal.parser.registerOscHandler(ShellIntegrationOscPs.SetCwd, data =>
-        this._handleSetCwd(data),
+        this.handleSetCwd(data),
       ),
     )
 
     // 注册三击选择事件处理
-    this._terminal.element?.addEventListener('mousedown', this._handleMouseDown.bind(this))
+    this.terminal.element?.addEventListener('mousedown', this.handleMouseDown.bind(this))
   }
 
-  private _handleMouseDown(event: MouseEvent) {
-    if (!this._terminal || event.detail !== 3) {
+  private handleMouseDown(event: MouseEvent) {
+    if (!this.terminal || event.detail !== 3) {
       return
     }
 
@@ -147,32 +147,32 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     const y = event.clientY - rect.top
 
     // 计算行号，修正计算行高的括号优先级
-    const rowHeight = (this._terminal.element?.clientHeight ?? 0) / this._terminal.rows
+    const rowHeight = (this.terminal.element?.clientHeight ?? 0) / this.terminal.rows
     const clickedLine = Math.floor(y / rowHeight)
 
     // 查找点击位置所在的语义区域
-    const zone = this._findZoneByLine(clickedLine)
+    const zone = this.findZoneByLine(clickedLine)
     if (!zone || zone.endLine === undefined) return
 
     // 计算选区长度（考虑换行符）
     // 选区长度 = 总列数 + 每行末尾的换行符（\r\n或\n，取决于平台）
     const lineCount = zone.endLine - zone.startLine + 1
     const newlineLength = 1 // \n 的长度为 1
-    const totalLength = (this._terminal.cols + newlineLength) * (lineCount - 1) + this._terminal.cols
+    const totalLength = (this.terminal.cols + newlineLength) * (lineCount - 1) + this.terminal.cols
 
     // 设置选区 - select(column, row, length)
-    this._terminal.select(0, zone.startLine, totalLength)
+    this.terminal.select(0, zone.startLine, totalLength)
   }
 
-  private _findZoneByLine(line: number): SemanticZone | undefined {
-    return this._zones.find(zone => (
+  private findZoneByLine(line: number): SemanticZone | undefined {
+    return this.zones.find(zone => (
       zone.startLine <= line
       && (zone.endLine === undefined || line <= zone.endLine)
     ))
   }
 
-  private _handleSetCwd(data: string): boolean {
-    if (!this._terminal) {
+  private handleSetCwd(data: string): boolean {
+    if (!this.terminal) {
       return false
     }
 
@@ -190,67 +190,67 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     return false
   }
 
-  private _handleFinalTermSequence(data: string): boolean {
-    if (!this._terminal || !this._buffer) {
+  private handleFinalTermSequence(data: string): boolean {
+    if (!this.terminal || !this.buffer) {
       return false
     }
 
     const [command, ...args] = data.split(';')
-    const currentLine = this._buffer.cursorY
+    const currentLine = this.buffer.cursorY
 
     switch (command) {
       case FinalTermOscPt.PromptStart: {
         // 如果有未结束的区域，关闭它
-        if (this._currentZone) {
-          this._currentZone.endLine = currentLine - 1
+        if (this.currentZone) {
+          this.currentZone.endLine = currentLine - 1
         }
 
-        this._currentZone = {
+        this.currentZone = {
           type: FinalTermOscPt.PromptStart,
           startLine: currentLine,
         }
-        this._zones.push(this._currentZone)
-        this._terminal.registerMarker(currentLine)
+        this.zones.push(this.currentZone)
+        this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandStart: {
-        if (this._currentZone?.type === FinalTermOscPt.PromptStart) {
-          this._currentZone.endLine = currentLine - 1
+        if (this.currentZone?.type === FinalTermOscPt.PromptStart) {
+          this.currentZone.endLine = currentLine - 1
         }
 
-        this._currentZone = {
+        this.currentZone = {
           type: FinalTermOscPt.CommandStart,
           startLine: currentLine,
         }
-        this._zones.push(this._currentZone)
-        this._terminal.registerMarker(currentLine)
+        this.zones.push(this.currentZone)
+        this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandExecuted: {
-        if (this._currentZone?.type === FinalTermOscPt.CommandStart) {
-          this._currentZone.endLine = currentLine - 1
+        if (this.currentZone?.type === FinalTermOscPt.CommandStart) {
+          this.currentZone.endLine = currentLine - 1
         }
 
-        this._currentZone = {
+        this.currentZone = {
           type: FinalTermOscPt.CommandExecuted,
           startLine: currentLine,
         }
-        this._zones.push(this._currentZone)
-        this._terminal.registerMarker(currentLine)
+        this.zones.push(this.currentZone)
+        this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandFinished: {
-        if (this._currentZone?.type === FinalTermOscPt.CommandExecuted) {
-          this._currentZone.endLine = currentLine - 1
+        if (this.currentZone?.type === FinalTermOscPt.CommandExecuted) {
+          this.currentZone.endLine = currentLine - 1
         }
 
-        this._currentZone = {
+        this.currentZone = {
           type: FinalTermOscPt.CommandFinished,
           startLine: currentLine,
           exitCode: args[0],
         }
-        this._zones.push(this._currentZone)
-        this._terminal.registerMarker(currentLine)
+        this.zones.push(this.currentZone)
+        this.terminal.registerMarker(currentLine)
         return true
       }
     }
@@ -258,8 +258,8 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     return false
   }
 
-  private _handleITermSequence(data: string): boolean {
-    if (!this._terminal || !this._buffer) {
+  private handleITermSequence(data: string): boolean {
+    if (!this.terminal || !this.buffer) {
       return false
     }
 
@@ -268,9 +268,9 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     switch (command) {
       case ITermOscPt.SetMark: {
         // 获取当前光标所在行
-        const line = this._buffer.cursorY
+        const line = this.buffer.cursorY
         // 在当前行创建一个 marker
-        this._terminal.registerMarker(line)
+        this.terminal.registerMarker(line)
         return true
       }
       default: {
@@ -291,15 +291,15 @@ export class ShellIntegrationAddon implements ITerminalAddon {
   }
 
   public getZoneAt(line: number): SemanticZone | undefined {
-    return this._findZoneByLine(line)
+    return this.findZoneByLine(line)
   }
 
   public getAllZones(): SemanticZone[] {
-    return this._zones
+    return this.zones
   }
 
   dispose(): void {
-    this._terminal?.element?.removeEventListener('mousedown', this._handleMouseDown.bind(this))
-    this._disposables.forEach(d => d.dispose())
+    this.terminal?.element?.removeEventListener('mousedown', this.handleMouseDown.bind(this))
+    this.disposables.forEach(d => d.dispose())
   }
 }
