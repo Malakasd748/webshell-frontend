@@ -2,9 +2,9 @@ import { h } from 'vue'
 import type { VNodeChild } from 'vue'
 import type { TreeOption } from 'naive-ui/es/tree/src/interface'
 
-import { FSTreeNode, FSService } from './base/fsService'
-import type { FSEntry } from './base/fsService'
-import { WebSocketManager } from './base/webSocketManager'
+import { FSTreeNode, FSService } from '../webSocketBase/fsService'
+import type { FSEntry } from '../webSocketBase/fsService'
+import { WebSocketManager } from '../webSocketBase/webSocketManager'
 
 export class WebshellFSService extends FSService<WebshellFSTreeNode> {
   constructor(protected override manager: WebSocketManager) {

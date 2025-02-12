@@ -1,6 +1,6 @@
-import type { PTYTerminal } from './services/base/ptyService'
-import type { WebshellWSManager } from './services/webshellWSManager'
-import { DragAndDropAddon } from './xterm/dragAndDropAddon'
+import type { PTYTerminal } from './webSocketBase/ptyService'
+import type { WebshellWSManager } from './webShell/webshellWSManager'
+import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
   private static managerMap = new Map<string, WebshellWSManager>()

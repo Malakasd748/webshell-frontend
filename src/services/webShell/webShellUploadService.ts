@@ -1,8 +1,8 @@
 import { h } from 'vue'
 import { useModal } from 'naive-ui'
 
-import { UploadService } from './base/uploadService'
-import type { UploadSession, DuplicatePolicy } from './base/uploadService'
+import { UploadService } from '../webSocketBase/uploadService'
+import type { UploadSession, DuplicatePolicy } from '../webSocketBase/uploadService'
 import type { WebshellWSManager } from './webshellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 

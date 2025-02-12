@@ -1,10 +1,10 @@
-import { WebSocketManager, type WebSocketManagerEventMap } from './base/webSocketManager'
+import { WebSocketManager, type WebSocketManagerEventMap } from '../webSocketBase/webSocketManager'
 import { WebshellPTYService } from './webShellPTYService'
 import { WebshellFSService } from './webShellFSService'
-import { UploadService } from './base/uploadService'
-import { useWebshellUploadStore } from '../stores/webShellUpload'
-import type { UploadSession } from './base/uploadService'
-import { WebshellResource } from '../webshellResource'
+import { UploadService } from '../webSocketBase/uploadService'
+import { useWebshellUploadStore } from '@/stores/webShellUpload'
+import type { UploadSession } from '../webSocketBase/uploadService'
+import { WebshellResource } from '@/models/webshellResource'
 
 // 允许服务扩展 WebSocketManager 的事件类型
 export interface WebshellWSManagerEventMap extends WebSocketManagerEventMap {}

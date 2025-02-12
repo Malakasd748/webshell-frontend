@@ -7,7 +7,7 @@ import { merge } from 'lodash-es'
 
 import { AutoFitAddon } from './autoFitAddon'
 import { ShellIntegrationAddon } from './shellIntegrationAddon'
-import type { PTYTerminal } from '../services/base/ptyService'
+import type { PTYTerminal } from '../services/webSocketBase/ptyService'
 
 export class Term extends Terminal implements PTYTerminal {
   container: HTMLElement | null = null

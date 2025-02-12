@@ -2,7 +2,7 @@ import type { ITerminalAddon } from '@xterm/xterm'
 import { useEventListener } from '@vueuse/core'
 
 import type { Term } from '.'
-import type { UploadService } from '../services/base/uploadService'
+import type { UploadService } from '../services/webSocketBase/uploadService'
 
 export class DragAndDropAddon implements ITerminalAddon {
   private terminal?: Term

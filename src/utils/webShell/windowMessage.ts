@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 
-import { HpcResource, type HpcResourceInit } from './hpcResource'
-import { useWebshellTermStore } from './stores/webShellTerm'
+import { HpcResource, type HpcResourceInit } from '@/models/hpcResource'
+import { useWebshellTermStore } from '@/stores/webShellTerm'
 
 interface Message {
   action: string

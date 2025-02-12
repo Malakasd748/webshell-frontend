@@ -5,7 +5,7 @@ import { defineStore } from 'pinia'
 import { Term } from '../xterm'
 import { useWebshellResourceStore } from './webShellResource'
 import { WebshellResource } from '../webshellResource'
-import { WebshellWSManager } from '../services/webshellWSManager'
+import { WebshellWSManager } from '../services/webShell/webshellWSManager'
 
 export const useWebshellTermStore = defineStore('webshell-term', () => {
   const resourceStore = useWebshellResourceStore()

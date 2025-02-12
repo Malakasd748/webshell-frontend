@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import type { UploadSession, SessionStatus } from '../services/base/uploadService'
+import type { UploadSession, SessionStatus } from '../services/webSocketBase/uploadService'
 
 export const useWebshellUploadStore = defineStore('webshell-upload', () => {
   const sessions = ref<UploadSession[]>([])

@@ -1,5 +1,5 @@
-import { PTYService, type PTYTerminal } from './base/ptyService'
-import { TermManagerRegistry } from '../termManagerRegistry'
+import { PTYService, type PTYTerminal } from '../webSocketBase/ptyService'
+import { TermManagerRegistry } from '../../termManagerRegistry'
 import { WebshellWSManager } from './webshellWSManager'
 
 export class WebshellPTYService extends PTYService {

@@ -1,4 +1,4 @@
-import type { WebshellWSManager } from './services/webshellWSManager'
+import type { WebshellWSManager } from '../services/webShell/webshellWSManager'
 
 export interface WebshellResourceInit {
   name: string
