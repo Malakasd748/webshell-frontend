@@ -1,6 +1,6 @@
 import type { ITerminalAddon, IDisposable, IBuffer } from '@xterm/xterm'
 
-import type { Term } from '..'
+import type { Term } from '.'
 
 /**
  * Shell integration is a feature that enhances the terminal's understanding of what's happening

@@ -41,7 +41,7 @@ export class AutoFitAddon extends FitAddon {
 
   override activate(term: Term) {
     super.activate(term)
-
+    this._terminal = term
     useResizeObserver(() => term.container, () => this.fit())
   }
 
