@@ -34,16 +34,13 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue'
+  import { ref, watch } from 'vue'
   import { NPopover, NButton } from 'naive-ui'
 
   import UploadList from '../UploadList'
-  import { useWebshellUploadStore } from '../stores/upload'
-  import { useWebshellTermStore } from '../stores/term'
-  import { TermManagerRegistry } from '../termManagerRegistry'
+  import { useWebShellUploadStore } from '@/stores/webShellUpload'
 
-  const webshellUploadStore = useWebshellUploadStore()
-  const webshellTermStore = useWebshellTermStore()
+  const webshellUploadStore = useWebShellUploadStore()
 
   // TODO: 延迟
 

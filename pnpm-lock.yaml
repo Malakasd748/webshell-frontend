@@ -66,9 +66,6 @@ importers:
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.1
-      '@types/testing-library__jest-dom':
-        specifier: ^6.0.0
-        version: 6.0.0
       '@vitejs/plugin-vue':
         specifier: ^5.2.1
         version: 5.2.1(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2))(vue@3.5.13(typescript@5.7.3))
@@ -108,6 +105,9 @@ importers:
       vitest:
         specifier: ^3.0.5
         version: 3.0.5(@types/node@22.13.1)(jiti@2.4.2)(jsdom@26.0.0)(tsx@4.19.2)
+      vue-eslint-parser:
+        specifier: ^9.4.3
+        version: 9.4.3(eslint@9.20.0(jiti@2.4.2))
       vue-tsc:
         specifier: ^2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -826,10 +826,6 @@ packages:
 
   '@types/node@22.13.1':
     resolution: {integrity: sha512-jK8uzQlrvXqEU91UxiK5J7pKHyzgnI1Qnl0QDHIgVGuolJhRb9EEl28Cj9b3rGR8B2lhFCtvIm5os8lFnO/1Ew==}
-
-  '@types/testing-library__jest-dom@6.0.0':
-    resolution: {integrity: sha512-bnreXCgus6IIadyHNlN/oI5FfX4dWgvGhOPvpr7zzCYDGAPIfvyIoAozMBINmhmsVuqV0cncejF2y5KC7ScqOg==}
-    deprecated: This is a stub types definition. @testing-library/jest-dom provides its own type definitions, so you do not need this installed.
 
   '@types/web-bluetooth@0.0.20':
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
@@ -2868,10 +2864,6 @@ snapshots:
   '@types/node@22.13.1':
     dependencies:
       undici-types: 6.20.0
-
-  '@types/testing-library__jest-dom@6.0.0':
-    dependencies:
-      '@testing-library/jest-dom': 6.6.3
 
   '@types/web-bluetooth@0.0.20': {}
 

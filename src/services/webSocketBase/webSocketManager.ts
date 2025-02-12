@@ -60,12 +60,10 @@ export abstract class WebSocketManager extends EventTarget {
         this.promiseMap.delete(key)
         if (message.error) {
           promise.reject(new Error(message.error))
-        }
-        else {
+        } else {
           promise.resolve(message.data)
         }
-      }
-      else {
+      } else {
         // 这是服务器主动发送的消息
         const service = this.services.get(message.service)
         if (!service) {
@@ -103,8 +101,7 @@ export abstract class WebSocketManager extends EventTarget {
       }
 
       this.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: true } }))
-    }
-    catch (error) {
+    } catch (error) {
       this.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: false } }))
       throw error
     }
@@ -171,8 +168,7 @@ export abstract class WebSocketManager extends EventTarget {
     if (noResponse) {
       await this.sendWithReconnect(JSON.stringify(message))
       return Promise.resolve() // TS 不知道这里对应返回值是void
-    }
-    else {
+    } else {
       return new Promise<Res>((resolve, reject) => {
         const key = `${message.service}:${message.action}:${message.id}` as const
         this.promiseMap.set(key, {
