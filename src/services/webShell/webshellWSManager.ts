@@ -1,6 +1,6 @@
 import { WebSocketManager, type WebSocketManagerEventMap } from '../webSocketBase/webSocketManager'
 import { WebshellPTYService } from './webShellPTYService'
-import { WebshellFSService } from './webShellFSService'
+import { WebShellFSService } from './webShellFSService'
 import { UploadService } from '../webSocketBase/uploadService'
 import { WebShellHeartbeatService } from './webShellHeartbeatService'
 import { useWebShellUploadStore } from '@/stores/webShellUpload'
@@ -22,7 +22,7 @@ export interface WebShellWSManager {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class WebShellWSManager extends WebSocketManager {
   readonly ptyService: WebshellPTYService
-  readonly fsService: WebshellFSService
+  readonly fsService: WebShellFSService
   readonly uploadService: UploadService
   readonly heartbeatService: WebShellHeartbeatService
   readonly resource: Readonly<WebShellResource>
@@ -33,7 +33,7 @@ export class WebShellWSManager extends WebSocketManager {
     resource.manager = this
 
     this.ptyService = new WebshellPTYService(this)
-    this.fsService = new WebshellFSService(this)
+    this.fsService = new WebShellFSService(this)
     this.heartbeatService = new WebShellHeartbeatService(this)
 
     const uploadSessions = useWebShellUploadStore().sessions

@@ -6,18 +6,18 @@ import { FSTreeNode, FSService } from '../webSocketBase/fsService'
 import type { FSEntry } from '../webSocketBase/fsService'
 import { WebSocketManager } from '../webSocketBase/webSocketManager'
 
-export class WebshellFSService extends FSService<WebshellFSTreeNode> {
+export class WebShellFSService extends FSService<WebShellFSTreeNode> {
   constructor(protected override manager: WebSocketManager) {
-    super(manager, (entry, parent) => new WebshellFSTreeNode(entry, parent))
+    super(manager, (entry, parent) => new WebShellFSTreeNode(entry, parent))
   }
 
-  override async rename(node: WebshellFSTreeNode) {
+  override async rename(node: WebShellFSTreeNode) {
     const newName = await node.rename()
     await super.rename(node, newName)
   }
 
-  override async create(parent: WebshellFSTreeNode, isDir = true) {
-    const newNode = new WebshellFSTreeNode(
+  override async create(parent: WebShellFSTreeNode, isDir = true) {
+    const newNode = new WebShellFSTreeNode(
       { isDir, mode: 0, modTime: 0, name: '', path: '', size: 0 },
       parent,
     )
@@ -27,14 +27,13 @@ export class WebshellFSService extends FSService<WebshellFSTreeNode> {
     try {
       const name = await newNode.rename()
       await super.create(parent, isDir, name)
-    }
-    catch {
+    } catch {
       parent.children.shift()
     }
   }
 }
 
-export class WebshellFSTreeNode extends FSTreeNode<WebshellFSTreeNode> implements TreeOption {
+export class WebShellFSTreeNode extends FSTreeNode<WebShellFSTreeNode> implements TreeOption {
   [x: string]: unknown;
 
   checkboxDisabled?: boolean
@@ -44,7 +43,7 @@ export class WebshellFSTreeNode extends FSTreeNode<WebshellFSTreeNode> implement
   suffix?: () => VNodeChild
   editable?: boolean
 
-  constructor(entry: FSEntry, parent?: WebshellFSTreeNode) {
+  constructor(entry: FSEntry, parent?: WebShellFSTreeNode) {
     super(entry, parent)
 
     this.prefix = this.isDir

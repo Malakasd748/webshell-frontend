@@ -1,5 +1,5 @@
 import type { PTYTerminal } from './webSocketBase/ptyService'
-import type { WebShellWSManager } from './webShell/webshellWSManager'
+import type { WebShellWSManager } from './webShell/webShellWSManager'
 import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
@@ -15,12 +15,14 @@ export class TermManagerRegistry {
 
   static getManager(term: PTYTerminal): WebShellWSManager | undefined
   static getManager(id: string): WebShellWSManager | undefined
+  static getManager(catchAll: unknown): WebShellWSManager | undefined
   static getManager(termOrId: PTYTerminal | string) {
-    if (typeof termOrId === 'string') {
-      return this.managerMap.get(termOrId)
-    }
-    else {
+    if (typeof termOrId === 'object') {
       return this.managerMap.get(termOrId.id)
+    } else if (typeof termOrId === 'string') {
+      return this.managerMap.get(termOrId)
+    } else {
+      return undefined
     }
   }
 

@@ -1,8 +1,11 @@
 <template>
   <div class="flex-(~ items-center) px-5 py-2">
-    <!-- <div class="text-xs font-400" v-if="webshellTermStore.lastFocusedTerm?.socket.latency">
-      会话延迟：{{ webshellStore.lastFocusedTerm?.socket.latency }}ms
-    </div> -->
+    <div
+      v-if="activeManager"
+      class="text-xs font-400"
+    >
+      会话延迟：{{ activeManager.latency }}ms
+    </div>
 
     <NPopover
       trigger="click"
@@ -34,15 +37,18 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import { NPopover, NButton } from 'naive-ui'
 
   import UploadList from '../UploadList'
   import { useWebShellUploadStore } from '@/stores/webShellUpload'
+  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
   const webshellUploadStore = useWebShellUploadStore()
+  const webshellTermStore = useWebShellTermStore()
 
-  // TODO: 延迟
+  const activeManager = computed(() => TermManagerRegistry.getManager(webshellTermStore.lastFocusedTerm?.id))
 
   const showUploadList = ref(false)
   function toggleUploadList() {
