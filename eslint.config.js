@@ -70,7 +70,7 @@ export default tseslint.config(
     extends: [stylistic.configs.customize({ braceStyle: '1tbs' })],
     rules: {
       '@stylistic/indent': 'off',
-      '@stylistic/quote-props': ['error', 'as-needed']
+      '@stylistic/quote-props': ['error', 'as-needed'],
     },
   },
 )
