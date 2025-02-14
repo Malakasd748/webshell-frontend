@@ -1,4 +1,4 @@
-import { watch, shallowReactive } from 'vue'
+import { shallowReactive } from 'vue'
 import { Terminal } from '@xterm/xterm'
 import { WebLinksAddon } from '@xterm/addon-web-links'
 import type { ITerminalOptions, ITerminalInitOnlyOptions } from '@xterm/xterm'
@@ -10,8 +10,8 @@ import { ShellIntegrationAddon } from './shellIntegrationAddon'
 import type { PTYTerminal } from '../services/webSocketBase/ptyService'
 
 export class Term extends Terminal implements PTYTerminal {
-  container: HTMLElement | null = null
   readonly id = String(Date.now())
+  container: HTMLElement | null = null
 
   private fitAddon = new AutoFitAddon()
   private shellIntegrationAddon = new ShellIntegrationAddon()
@@ -24,10 +24,19 @@ export class Term extends Terminal implements PTYTerminal {
     return this.shellIntegrationAddon.cwd
   }
 
-  private constructor(options?: ITerminalOptions | ITerminalInitOnlyOptions) {
+  constructor(options?: ITerminalOptions | ITerminalInitOnlyOptions) {
     type Option = Exclude<typeof options, undefined>
-    super(merge<Option, Option>({ cursorBlink: true }, options ?? {}))
 
+    super(merge<Option, Option>({ cursorBlink: true }, options ?? {}))
+    const reactiveThis = shallowReactive(this)
+
+    reactiveThis.setupAddons()
+    Term.newTermCallbacks.forEach(cb => cb(reactiveThis))
+    return reactiveThis
+  }
+
+  // should only call once
+  private setupAddons() {
     this.loadAddon(this.fitAddon)
     this.loadAddon(this.shellIntegrationAddon)
     this.loadAddon(new WebLinksAddon())
@@ -38,22 +47,9 @@ export class Term extends Terminal implements PTYTerminal {
     this.newTermCallbacks.push(cb)
   }
 
-  static new(options?: ITerminalOptions | ITerminalInitOnlyOptions): Term {
-    const term = shallowReactive(new Term(options))
-
-    watch(
-      () => term.container,
-      (el) => {
-        if (!el) {
-          return
-        }
-        term.open(el)
-        term.element!.style.paddingLeft = '20px'
-        term.element!.style.paddingTop = '12px'
-      },
-    )
-
-    this.newTermCallbacks.forEach(cb => cb(term))
-    return term
+  override open(parent: HTMLElement): void {
+    super.open(parent)
+    this.container = parent
+    this.element!.style.paddingLeft = '20px'
   }
 }

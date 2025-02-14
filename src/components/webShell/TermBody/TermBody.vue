@@ -4,7 +4,7 @@
     content-class="size-full"
   >
     <div
-      :ref="el => emit('container-change', el as HTMLDivElement)"
+      :ref="el => el && term.open(el as HTMLElement)"
       class="contain-strict size-full"
       :style="{ backgroundColor: settingsStore.theme.background }"
     ></div>
@@ -25,22 +25,18 @@
     term: Term
   }>()
 
-  const emit = defineEmits<{
-    (e: 'container-change', value: HTMLDivElement | null): void
-  }>()
-
   const loading = ref(false)
   const manager = computed(() => TermManagerRegistry.getManager(term.id))
   watch(manager, (manager) => {
     if (manager) {
-      manager.addEventListener('reconnect-start', () => {
+      manager.e.addEventListener('reconnect-start', () => {
         loading.value = true
       })
-      manager.addEventListener('reconnect-end', () => {
+      manager.e.addEventListener('reconnect-end', () => {
         loading.value = false
       })
     }
-  })
+  }, { immediate: true })
 </script>
 
 <style scoped></style>

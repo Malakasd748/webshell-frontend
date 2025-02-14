@@ -74,69 +74,64 @@
         </NLayoutFooter>
       </NLayout>
     </NLayout>
-
+    <!--
     <ChatButton
       v-show="showChat"
       :x="chatX"
       :y="chatY"
       drawer-to=".chat-drawer-target"
       :initial-input="chatInitialInput"
-    />
+    /> -->
   </NLayout>
 </template>
 
 <script setup lang="ts">
-  import { useFullscreen, useMouse } from '@vueuse/core'
-  import { debounce } from 'lodash-es'
+  import { useFullscreen } from '@vueuse/core'
   import { NButton, NLayout, NLayoutFooter, NLayoutHeader, NLayoutSider } from 'naive-ui'
-  import { computed, ref, useTemplateRef, watchEffect } from 'vue'
+  import { computed, ref, useTemplateRef, watchEffect, onMounted } from 'vue'
 
-  import ChatButton from './ChatButton.vue'
   import { useWebShellStateStore } from '../stores/webShellStates'
   import { useWebShellTermStore } from '../stores/webShellTerm'
+  import { useWebShellResourceStore } from '../stores/webShellResource'
   import TermBody from '@/components/webShell/TermBody'
   import TermFooter from '@/components/webShell/TermFooter'
-  import { Term } from '../xterm'
-
-  const respondSelectionChange = debounce((t: Term) => {
-    chatInitialInput.value = t.getSelection()
-    showChat.value = true
-    chatX.value = mouseX.value + 24
-    chatY.value = mouseY.value - 24
-  }, 200)
+  import TermHeader from '@/components/webShell/TermHeader'
+  import TermSettings from '@/components/webShell/TermSettings'
+  import TermSider from '@/components/webShell/TermSider'
+  import { Term } from '@/xterm'
+  import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
   const activeTab = ref<string>('settings')
   const siderCollapsed = ref(false)
   const settingsTabSelected = computed(() => activeTab.value === 'settings')
 
   const stateStore = useWebShellStateStore()
-  const terms = useWebShellTermStore().terms
+  const termStore = useWebShellTermStore()
+  const resourceStore = useWebShellResourceStore()
+  const terms = termStore.terms
 
   Term.registerNewTermCallback((t) => {
     setTimeout(() => (activeTab.value = t.id), 10)
     t.onSelectionChange(() => {
       const selected = t.getSelection()
       if (!selected) {
-        showChat.value = false
         return
       }
-      respondSelectionChange(t)
     })
   })
-
-  // webshellStore.onRemoveTerm((t) => {
-  //   const preTab = activeTab.value;
-  //   if (activeTab.value === t.id) {
-  //     setTimeout(() => (activeTab.value = terms.value.at(-1)?.id || 'settings'), 10);
-  //   } else {
-  //     setTimeout(() => (activeTab.value = preTab), 10);
-  //   }
-  // });
 
   const fullscreenTarget = useTemplateRef('fullscreenTarget')
   const fullscreen = useFullscreen(fullscreenTarget)
 
   watchEffect(() => (stateStore.isFullscreen = fullscreen.isFullscreen.value))
+
+  onMounted(async () => {
+    await resourceStore.fetchResources()
+    if (resourceStore.resources.length > 0) {
+      resourceStore.selectResourceById(resourceStore.resources[0].id)
+      await termStore.addTerm()
+    }
+  })
 </script>
 
 <style scoped></style>

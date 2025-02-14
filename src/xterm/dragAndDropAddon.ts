@@ -15,9 +15,9 @@ export class DragAndDropAddon implements ITerminalAddon {
     this.terminal = terminal
 
     this.cleanupFns.push(
-      useEventListener(terminal.container, 'dragover', ev => ev.preventDefault()),
+      useEventListener(() => terminal.container, 'dragover', ev => ev.preventDefault()),
     )
-    this.cleanupFns.push(useEventListener(terminal.container, 'drop', ev => this.handleDrop(ev)))
+    this.cleanupFns.push(useEventListener(() => terminal.container, 'drop', ev => this.handleDrop(ev)))
   }
 
   dispose(): void {

@@ -57,6 +57,7 @@
       >
         <UploadListItem
           v-for="(s, i) in sessions"
+          :key="i"
           :session="s"
           @redo="s.redo()"
           @cancel="s.cancel()"
@@ -68,22 +69,22 @@
 </template>
 
 <script setup lang="ts">
-  import { useTemplateRef } from 'vue'
   import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui'
 
   import UploadListItem from './UploadListItem.vue'
-  import { useWebshellUploadStore } from '../stores/upload'
+  import { useWebShellUploadStore } from '@/stores/webShellUpload'
+  import type { UploadSession } from '@/services/webSocketBase/uploadService'
 
   defineOptions({ inheritAttrs: false })
 
-  const uploadStore = useWebshellUploadStore()
+  const uploadStore = useWebShellUploadStore()
 
   const { dark = false } = defineProps<{ dark?: boolean }>()
   const emit = defineEmits<{
-    (e: 'hide-clicked')
+    (e: 'hide-clicked'): void
   }>()
 
-  const sessions = uploadStore.sessions
+  const sessions = uploadStore.sessions as UploadSession[]
 </script>
 
 <style scoped></style>

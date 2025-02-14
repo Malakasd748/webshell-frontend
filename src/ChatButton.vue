@@ -160,8 +160,7 @@
     if (ev.key === 'Enter') {
       if (shiftPressed.value) {
         return
-      }
-      else {
+      } else {
         sendInput()
       }
     }

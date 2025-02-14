@@ -1,10 +1,10 @@
 <template>
   <div class="flex-(~ items-center) px-5 py-2">
     <div
-      v-if="activeManager"
+      v-if="latency !== undefined"
       class="text-xs font-400"
     >
-      会话延迟：{{ activeManager.latency }}ms
+      会话延迟：{{ latency }}ms
     </div>
 
     <NPopover
@@ -48,7 +48,7 @@
   const webshellUploadStore = useWebShellUploadStore()
   const webshellTermStore = useWebShellTermStore()
 
-  const activeManager = computed(() => TermManagerRegistry.getManager(webshellTermStore.lastFocusedTerm?.id))
+  const latency = computed(() => TermManagerRegistry.getManager(webshellTermStore.lastFocusedTerm?.id)?.latency)
 
   const showUploadList = ref(false)
   function toggleUploadList() {

@@ -1,5 +1,8 @@
 <template>
-  <NConfigProvider :theme-overrides="naiveThemeOverride">
+  <NConfigProvider
+    :theme-overrides="naiveThemeOverride"
+    :theme="darkTheme"
+  >
     <NModalProvider>
       <NMessageProvider>
         <router-view />
@@ -9,7 +12,7 @@
 </template>
 
 <script setup lang='ts'>
-  import { NConfigProvider, NModalProvider, NMessageProvider } from 'naive-ui'
+  import { NConfigProvider, NModalProvider, NMessageProvider, darkTheme } from 'naive-ui'
   import naiveThemeOverride from './theme/naiveThemeOverride'
 </script>
 

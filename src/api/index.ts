@@ -88,13 +88,11 @@ class AxiosService {
               this.refreshTokenConfig.applyToken(newToken, axiosConfig)
               this.onRefreshSuccess(newToken)
               return this.axios(originalConfig)
-            }
-            catch (refreshError) {
+            } catch (refreshError) {
               const error = refreshError instanceof Error ? refreshError : new Error(String(refreshError))
               this.onRefreshFailure()
               return Promise.reject(error)
-            }
-            finally {
+            } finally {
               this.isRefreshing = false
             }
           }

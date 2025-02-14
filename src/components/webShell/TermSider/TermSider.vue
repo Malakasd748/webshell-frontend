@@ -67,11 +67,11 @@
   import { NButton, NLayout, NLayoutHeader, NSwitch, NTooltip } from 'naive-ui'
   import { ref } from 'vue'
 
-  import type { WebshellWSManager } from '../services/webshellWSManager'
+  import type { WebShellWSManager } from '@/services/webShell/webShellWSManager'
   import FileTree from './FileTree'
 
   const { manager } = defineProps<{
-    manager: WebshellWSManager
+    manager: WebShellWSManager
   }>()
   const collapsed = defineModel<boolean>('collapsed', { required: true })
 

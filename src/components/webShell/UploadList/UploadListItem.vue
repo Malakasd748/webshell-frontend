@@ -1,6 +1,6 @@
 <template>
   <NListItem
-    ref="itemRoot"
+    ref="item-root"
     class="text-12px"
   >
     <NGrid>
@@ -24,7 +24,7 @@
           </NEllipsis>
           <div :style="{ color: textColorDisabled }">
             <template v-if="showSizeProgress">
-              {{ getSize(session.doneSize.value) }} / {{ getSize(session.totalSize.value) }}
+              {{ getSize(session.doneSize) }} / {{ getSize(session.doneSize) }}
             </template>
             <NDivider
               v-if="showSizeProgress && showCountProgress"
@@ -32,8 +32,7 @@
               :style="{ backgroundColor: textColorDisabled }"
             />
             <template v-if="showCountProgress">
-              {{ session.doneFiles.size }} /
-              {{ session.pendingFiles.size + session.doneFiles.size }}
+              {{ session.doneFilesCount }} / {{ session.totalFilesCount }}
             </template>
           </div>
         </div>
@@ -44,10 +43,10 @@
         class="flex-(~ gap-2 items-center)"
       >
         <span
-          :style="{ backgroundColor: itemMap[session.status.value!][0] }"
+          :style="{ backgroundColor: itemMap[session.status!][0] }"
           class="size-6px rounded-full inline-block"
         ></span>
-        <span>{{ itemMap[session.status.value!][1] }}</span>
+        <span>{{ itemMap[session.status!][1] }}</span>
       </NGi>
 
       <NGi
@@ -55,7 +54,7 @@
         class="flex-(~ gap-2 items-center justify-end)"
       >
         <NTooltip
-          v-if="removableStatuses.includes(session.status.value!)"
+          v-if="removableStatuses.includes(session.status!)"
           content-class="w-max"
         >
           清除
@@ -70,7 +69,7 @@
           </template>
         </NTooltip>
         <NTooltip
-          v-if="redoableStatuses.includes(session.status.value!)"
+          v-if="redoableStatuses.includes(session.status!)"
           content-class="w-max"
         >
           重传
@@ -87,8 +86,8 @@
 
         <NTooltip
           v-if="
-            cancelableStatuses.includes(session.status.value!) ||
-              (session.status.value === 'uploading' && hovered)
+            cancelableStatuses.includes(session.status!) ||
+              (session.status === 'uploading' && hovered)
           "
           content-class="w-max"
         >
@@ -105,7 +104,7 @@
         </NTooltip>
 
         <div
-          v-if="session.status.value === 'uploading' && !hovered"
+          v-if="session.status === 'uploading' && !hovered"
           class="flex items-center"
         >
           <img
@@ -123,7 +122,7 @@
         :tooltip="{ contentClass: 'w-max' }"
       >
         <template v-if="showUploadingFile">
-          {{ uploadingFile?.relativePath }}
+          {{ session.currentFileRelativePath }}
         </template>
         <template v-else-if="showDestination">
           {{ session.path }}
@@ -134,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, toRefs, toRef, computed, useTemplateRef } from 'vue'
+  import { ref, toRefs, computed, useTemplateRef } from 'vue'
   import {
     NListItem,
     NGrid,
@@ -147,8 +146,8 @@
   } from 'naive-ui'
   import { useEventListener } from '@vueuse/core'
 
-  import type { UploadSession, SessionStatus } from '../webshellSocket/uploadService'
-  import SpinnerImg from '@/assets/images/webshell/spinner.png'
+  import type { UploadSession, SessionStatus } from '@/services/webSocketBase/uploadService'
+  import SpinnerImg from '#assets/images/webshell/spinner.png'
 
   const { session } = defineProps<{ session: UploadSession }>()
   const emit = defineEmits<{
@@ -157,7 +156,7 @@
     (e: 'redo', session: UploadSession): void
   }>()
 
-  type UploadListItemMap = Record<SessionStatus, [string, string]>
+  type UploadListItemMap = Record<NonNullable<SessionStatus>, [string, string]>
   const itemMap: UploadListItemMap = {
     completed: ['rgba(82, 196, 26, 1)', '已完成'],
     uploading: ['rgba(24, 144, 255, 1)', '传输中'],
@@ -169,18 +168,16 @@
 
   const { textColorBase, textColorDisabled } = toRefs(useThemeVars().value)
 
-  const uploadingFile = toRef(() => session.pendingFiles.values().next().value)
-  const showSizeProgress = computed(
-    () => session.status.value !== 'preparing' && session.totalSize.value > 0,
-  )
+  const showSizeProgress = computed(() => session.status !== 'preparing' && session.totalSize > 0)
   const showCountProgress = computed(
     () =>
-      session.type === 'directory' && (session.pendingFiles.size > 0 || session.doneFiles.size > 0),
+      session.type === 'directory'
+      && (session.totalFilesCount - session.doneFilesCount > 0 || session.doneFilesCount > 0),
   )
   const showUploadingFile = computed(
-    () => session.type === 'directory' && session.status.value === 'uploading',
+    () => session.type === 'directory' && session.status === 'uploading',
   )
-  const showDestination = computed(() => session.status.value === 'completed')
+  const showDestination = computed(() => session.status === 'completed')
 
   const cancelableStatuses: readonly SessionStatus[] = ['pending', 'preparing']
   const redoableStatuses: readonly SessionStatus[] = ['error', 'cancelled']
@@ -198,13 +195,15 @@
 
   const hovered = ref(false)
 
-  const itemRoot = useTemplateRef('itemRoot')
+  const itemRoot = useTemplateRef('item-root')
   useEventListener(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     () => itemRoot.value?.$el,
     'mouseenter',
     () => (hovered.value = true),
   )
   useEventListener(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     () => itemRoot.value?.$el,
     'mouseleave',
     () => (hovered.value = false),

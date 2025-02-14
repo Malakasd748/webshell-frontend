@@ -21,7 +21,7 @@
 
   import { useWebShellResourceStore } from '@/stores/webShellResource'
   import { useWebShellTermStore } from '@/stores/webShellTerm'
-  import { webshellNotifyOpenerReady, setupWebshell } from '@/utils/webShell/windowMessage'
+  // import { webshellNotifyOpenerReady, setupWebshell } from '@/utils/webShell/windowMessage'
 
   const props = defineProps(popselectProps)
 
@@ -41,8 +41,8 @@
     resourceStore.resources.map(r => ({ label: r.name, value: r.id })),
   )
 
-  setupWebshell()
-  webshellNotifyOpenerReady()
+  // setupWebshell()
+  // webshellNotifyOpenerReady()
 </script>
 
 <style scoped></style>
