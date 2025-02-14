@@ -15,7 +15,8 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "#assets/*": ["./src/assets/*"],
     },
     "types": ["vite/client"],
     "allowJs": true,

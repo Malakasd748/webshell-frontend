@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [vue(), VueJSX(), UnoCSS()],
   resolve: {
     alias: {
-      '^@/': resolve(import.meta.dirname, 'src') + '/',
+      '@/': resolve(import.meta.dirname, 'src') + '/',
     },
   },
   test: {
