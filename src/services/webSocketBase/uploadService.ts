@@ -54,7 +54,15 @@ export class UploadService extends WebSocketService {
 
   protected manager?: WebSocketManager
 
-  constructor(public sessionList: UploadSession[]) {
+  constructor(
+    public sessionList: UploadSession[],
+    private sessionFactory: (
+      service: UploadService,
+      type: 'file' | 'directory',
+      name: string,
+      dest: string,
+    ) => UploadSession,
+  ) {
     super()
   }
 
@@ -84,22 +92,23 @@ export class UploadService extends WebSocketService {
   }
 
   async dropUpload(entry: FileSystemEntry, dest: string) {
-    if (entry instanceof FileSystemFileEntry) {
+    if (isFileSystemFileEntry(entry)) {
       await this.dropFileUpload(entry, dest)
-    } else if (entry instanceof FileSystemDirectoryEntry) {
+    } else if (isFileSystemDirectoryEntry(entry)) {
       await this.dropDirectoryUpload(entry, dest)
+    } else {
+      throw new TypeError('invalid parameter')
     }
-    throw new TypeError('invalid parameter')
   }
 
   private async dropFileUpload(entry: FileSystemFileEntry, dest: string) {
-    const session = new UploadSession(this, 'file', entry.name, dest)
+    const session = this.sessionFactory(this, 'file', entry.name, dest)
     await session.setup(entry)
     await this.startUpload(session)
   }
 
   private async dropDirectoryUpload(entry: FileSystemDirectoryEntry, dest: string) {
-    const session = new UploadSession(this, 'directory', entry.name, dest)
+    const session = this.sessionFactory(this, 'directory', entry.name, dest)
     await session.setup(entry)
     await this.startUpload(session)
   }
@@ -125,7 +134,7 @@ export class UploadService extends WebSocketService {
     const handles = await window.showOpenFilePicker({ multiple: true, id: 'upload-file' })
     const promises: Promise<void>[] = []
     for (const handle of handles) {
-      const session = new UploadSession(this, 'file', handle.name, dest)
+      const session = this.sessionFactory(this, 'file', handle.name, dest)
       await session.setup(handle)
       promises.push(this.startUpload(session))
     }
@@ -134,7 +143,7 @@ export class UploadService extends WebSocketService {
 
   private async directoryPickerUpload(dest: string) {
     const handle = await window.showDirectoryPicker({ id: 'upload-directory' })
-    const session = new UploadSession(this, 'directory', handle.name, dest)
+    const session = this.sessionFactory(this, 'directory', handle.name, dest)
     await session.setup(handle)
     return this.startUpload(session)
   }
@@ -151,7 +160,7 @@ export class UploadService extends WebSocketService {
         const promises: Promise<void>[] = []
         try {
           for (const file of input.files) {
-            const session = new UploadSession(this, 'file', file.name, dest)
+            const session = this.sessionFactory(this, 'file', file.name, dest)
             await session.setup(file)
             promises.push(this.startUpload(session))
           }
@@ -175,7 +184,7 @@ export class UploadService extends WebSocketService {
         if (!input.files?.length) return resolve()
 
         const dirName = input.files[0].webkitRelativePath.split('/')[0]
-        const session = new UploadSession(this, 'directory', dirName, dest)
+        const session = this.sessionFactory(this, 'directory', dirName, dest)
         await session.setup(input.files)
         await this.startUpload(session)
         resolve()
@@ -209,6 +218,10 @@ export class UploadService extends WebSocketService {
 
     session.setStatus('uploading')
     this.sessionList.push(session)
+
+    if (session.entries.length === 0) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
 
     for (let i = 0; i < session.entries.length; i++) {
       // 如果上传速率超过了遍历速率，则等一等遍历
@@ -263,7 +276,7 @@ export class UploadService extends WebSocketService {
           await this.request(session.path, UploadAction.CompleteFile, { digest })
           break
         }
-        const chunkPromise = this.request(entry.path, UploadAction.Chunk, {
+        const chunkPromise = this.request(session.path, UploadAction.Chunk, {
           progress: session.doneSize,
         })
         // Send the chunk data
@@ -275,7 +288,8 @@ export class UploadService extends WebSocketService {
       }
     }
 
-    await this.request(session.dest, UploadAction.CompleteSession, undefined)
+    await this.request(session.path, UploadAction.CompleteSession, undefined)
+    session.setStatus('completed')
   }
 }
 
@@ -347,6 +361,7 @@ export class UploadSession {
   redo() {
     this.doneFilesCount = 0
     this.doneSize = 0
+    this.removeFromList()
     return this._service.startUpload(this)
   }
 
@@ -386,14 +401,14 @@ export class UploadSession {
       promise = this.setupFile(arg)
     } else if (arg instanceof FileList) {
       promise = this.setupFileList(arg)
-    } else if (arg instanceof FileSystemFileEntry) {
-      promise = this.setupFileEntry(arg)
-    } else if (arg instanceof FileSystemDirectoryEntry) {
-      promise = this.setupDirectoryEntry(arg)
     } else if (arg instanceof FileSystemFileHandle) {
       promise = this.setupFileHandle(arg)
     } else if (arg instanceof FileSystemDirectoryHandle) {
       promise = this.setupDirectoryHandle(arg)
+    } else if (isFileSystemFileEntry(arg)) {
+      promise = this.setupFileEntry(arg)
+    } else if (isFileSystemDirectoryEntry(arg)) {
+      promise = this.setupDirectoryEntry(arg)
     } else {
       promise = Promise.reject(new Error('invalid session setup argument'))
     }
@@ -499,4 +514,16 @@ export class UploadSession {
 
     await setupHandle(this.dest, handle)
   }
+}
+
+export function isFileSystemEntry(arg: unknown): arg is FileSystemEntry {
+  return typeof arg === 'object' && arg !== null && 'isFile' in arg && 'isDirectory' in arg
+}
+
+export function isFileSystemFileEntry(entry: unknown): entry is FileSystemFileEntry {
+  return isFileSystemEntry(entry) && entry.isFile
+}
+
+export function isFileSystemDirectoryEntry(entry: FileSystemEntry): entry is FileSystemDirectoryEntry {
+  return isFileSystemEntry(entry) && entry.isDirectory
 }

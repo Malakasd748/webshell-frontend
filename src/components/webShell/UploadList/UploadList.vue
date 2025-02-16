@@ -56,7 +56,7 @@
         style="background-color: #434343"
       >
         <UploadListItem
-          v-for="(s, i) in sessions"
+          v-for="(s, i) in <UploadSession[]>sessions"
           :key="i"
           :session="s"
           @redo="s.redo()"
@@ -70,6 +70,7 @@
 
 <script setup lang="ts">
   import { NList, NConfigProvider, darkTheme, NTooltip, NButton } from 'naive-ui'
+  import { storeToRefs } from 'pinia'
 
   import UploadListItem from './UploadListItem.vue'
   import { useWebShellUploadStore } from '@/stores/webShellUpload'
@@ -84,7 +85,7 @@
     (e: 'hide-clicked'): void
   }>()
 
-  const sessions = uploadStore.sessions as UploadSession[]
+  const { sessions } = storeToRefs(uploadStore)
 </script>
 
 <style scoped></style>

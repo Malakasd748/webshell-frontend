@@ -39,6 +39,7 @@
 <script setup lang="ts">
   import { ref, watch, computed } from 'vue'
   import { NPopover, NButton } from 'naive-ui'
+  import { storeToRefs } from 'pinia'
 
   import UploadList from '../UploadList'
   import { useWebShellUploadStore } from '@/stores/webShellUpload'
@@ -55,10 +56,11 @@
     showUploadList.value = !showUploadList.value
   }
 
-  const uploadSessions = webshellUploadStore.sessions
+  const { sessions: uploadSessions } = storeToRefs(webshellUploadStore)
   watch(
-    () => uploadSessions.length,
+    () => uploadSessions.value.length,
     (newlen, oldlen) => {
+      console.log(newlen, oldlen)
       if (newlen > oldlen) {
         showUploadList.value = true
       }

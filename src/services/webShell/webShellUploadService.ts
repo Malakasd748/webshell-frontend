@@ -1,10 +1,10 @@
-import { h } from 'vue'
-import { useModal } from 'naive-ui'
+import { h, shallowReactive } from 'vue'
 
-import { UploadService } from '../webSocketBase/uploadService'
-import type { UploadSession, DuplicatePolicy } from '../webSocketBase/uploadService'
+import { UploadService, UploadSession } from '../webSocketBase/uploadService'
+import type { DuplicatePolicy } from '../webSocketBase/uploadService'
 import type { WebShellWSManager } from './webShellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
+import naiveApi from '@/providers/naiveApi'
 
 // 利用 TypeScript 的声明合并，扩展事件类型
 declare module '../webSocketBase/webSocketManager' {
@@ -15,7 +15,7 @@ declare module '../webSocketBase/webSocketManager' {
 
 export class WebShellUploadService extends UploadService {
   constructor(sessions: UploadSession[]) {
-    super(sessions)
+    super(sessions, (service, type, name, dest) => shallowReactive(new UploadSession(service, type, name, dest)))
   }
 
   override register(manager: WebShellWSManager) {
@@ -32,13 +32,11 @@ export class WebShellUploadService extends UploadService {
 
 function doConfirm(session: UploadSession) {
   return new Promise<DuplicatePolicy>((resolve, reject) => {
-    const modal = useModal()
-    const { destroy } = modal.create({
+    const { destroy } = naiveApi.dialog.warning({
       title: '目标路径已存在',
       content: `${session.path} 已存在，是否继续操作？`,
-      preset: 'dialog',
       closable: true,
-      footer: () =>
+      action: () =>
         h(ConfirmActions, {
           onKeepBoth() {
             resolve('rename')
