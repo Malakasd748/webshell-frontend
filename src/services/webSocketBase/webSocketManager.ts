@@ -111,11 +111,15 @@ export abstract class WebSocketManager {
     }
   }
 
+  private messageQueue: string[] = []
+  private isReconnecting = false
+
   private async sendWithReconnect(message: string) {
     if (this._ws.readyState === WebSocket.OPEN) {
       this._ws.send(message)
       return
     }
+
     if (this._ws.readyState === WebSocket.CONNECTING) {
       await new Promise<void>((resolve, reject) => {
         this._ws.addEventListener('open', () => resolve(), { once: true })
@@ -126,8 +130,22 @@ export abstract class WebSocketManager {
     }
 
     // 如果连接已关闭或正在关闭，尝试重连
-    await this.reconnect()
-    this._ws.send(message)
+    this.messageQueue.push(message)
+    if (!this.isReconnecting) {
+      this.isReconnecting = true
+      try {
+        await this.reconnect()
+        // 发送队列中的所有消息
+        while (this.messageQueue.length > 0) {
+          const msg = this.messageQueue.shift()
+          if (msg) {
+            this._ws.send(msg)
+          }
+        }
+      } finally {
+        this.isReconnecting = false
+      }
+    }
   }
 
   /**
