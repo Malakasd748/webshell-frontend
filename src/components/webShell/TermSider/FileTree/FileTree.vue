@@ -45,7 +45,6 @@
     TreeOverrideNodeClickBehavior,
   } from 'naive-ui/es/tree/src/interface'
   import { useKeyModifier } from '@vueuse/core'
-  import { useModal } from 'naive-ui'
 
   import { FileTreeContextMenu } from './contextMenu'
   import type { ContextMenuActions, ContextMenuOption } from './contextMenu'
@@ -53,6 +52,7 @@
   import type { WebShellWSManager } from '@/services/webShell/webShellWSManager'
   import type { WebShellFSTreeNode } from '@/services/webShell/webShellFSService'
   import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import naiveApi from '@/providers/naiveApi'
 
   const { manager, showHiddenFiles = false } = defineProps<{
     manager: WebShellWSManager
@@ -61,7 +61,6 @@
 
   const webshellTermStore = useWebShellTermStore()
   const fsService = computed(() => reactive(manager.fsService))
-  const modal = useModal()
   const expandedKeys = ref<string[]>([])
   const selectedKeys = ref<string[]>([])
   const copiedNodes = ref<WebShellFSTreeNode[]>([])
@@ -185,11 +184,12 @@
       await fsService.value.rename(node)
     },
     delete(node) {
-      const { destroy } = modal.create({
+      const { destroy } = naiveApi.dialog.warning({
         title: '文件删除后不可恢复',
         content: `确认删除 ${node.path} 吗？`,
-        preset: 'dialog',
-        style: { top: '120px' },
+        class: 'mt-30',
+        positiveText: '确认',
+        negativeText: '取消',
         onPositiveClick: () => {
           void fsService.value.delete(node)
           destroy()
