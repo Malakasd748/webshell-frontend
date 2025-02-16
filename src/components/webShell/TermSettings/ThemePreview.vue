@@ -52,12 +52,12 @@
 
   const theme = availableThemes[themeName]
 
-  const demoText = `\x1b[37mNormal Text \x1b[0m\x1b[1mBold\x1b[0m \x1b[3mItalic\x1b[0m
-\x1b[31mRed \x1b[32mGreen \x1b[33mYellow \x1b[34mBlue\x1b[0m
-\x1b[35mMagenta \x1b[36mCyan \x1b[37mWhite\x1b[0
-\x1b[1m\x1b[31mBold Red\x1b[0m \x1b[1m\x1b[34mBold Blue\x1b[0m
-[user@server ~]$ ls -l
-\x1b[1;34mDocuments\x1b[0m  \x1b[1;32mscript.sh\x1b[0m  \x1b[1;31merror.log\x1b[0m`
+  const demoText = `\x1b[1;32muser@server\x1b[0m:\x1b[1;34m~\x1b[0m$ ls -l\r
+\x1b[0;34mdrwxr-xr-x\x1b[0m  8 user  staff   256  \x1b[1;34mnode_modules\x1b[0m\r
+\x1b[0;34mdrwxr-xr-x\x1b[0m  4 user  staff   128  \x1b[1;36mdist\x1b[0m\r
+-rw-r--r--  1 user  staff  2048  \x1b[1;33mpackage.json\x1b[0m\r
+-rwxr-xr-x  1 user  staff   892  \x1b[1;32mdeploy.sh\x1b[0m\r
+-rw-r--r--  1 user  staff  1024  \x1b[1;31mREADME.md\x1b[0m\r`
 
   onMounted(() => {
     const t = new Terminal({
@@ -67,7 +67,6 @@
       disableStdin: true,
     })
     t.open(terminalContainer.value as HTMLDivElement)
-    t.write(demoText)
 
     t.element!.style.padding = '12px 16px'
 
@@ -79,6 +78,8 @@
       (fontSize) => {
         t.options = { fontSize }
         fitAddon.fit()
+        t.clear()
+        t.write(demoText)
       },
       { immediate: true },
     )
