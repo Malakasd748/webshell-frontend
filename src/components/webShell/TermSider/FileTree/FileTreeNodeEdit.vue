@@ -29,7 +29,7 @@
 
     <template #trigger>
       <NInput
-        ref="inputRef"
+        ref="input-ref"
         v-model:value="inputModel"
         size="tiny"
         placeholder=""
@@ -76,8 +76,7 @@
     if (ev.key === 'Escape') {
       emit('cancel')
       cancelled = true
-    }
-    else if (ev.key === 'Enter') {
+    } else if (ev.key === 'Enter') {
       if (nameInvalid.value) {
         return
       }
@@ -101,10 +100,12 @@
     emit('update:value', inputModel.value)
   }
 
-  const inputRef = useTemplateRef('inputRef')
+  const inputComponent = useTemplateRef('input-ref')
   onMounted(() => {
-    inputRef.value!.focus()
-    inputRef.value!.select()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    inputComponent.value!.focus()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    inputComponent.value!.select()
   })
 </script>
 
