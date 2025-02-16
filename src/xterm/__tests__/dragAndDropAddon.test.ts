@@ -17,7 +17,7 @@ global.DragEvent = MockDragEvent as any
 
 class MockUploadService extends UploadService {
   constructor() {
-    super({} as any, [])
+    super([])
   }
 
   readonly name = 'upload'

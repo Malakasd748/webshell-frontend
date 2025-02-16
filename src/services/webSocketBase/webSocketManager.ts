@@ -19,8 +19,9 @@ export interface WebSocketManagerEventMap {
   'reconnect-start': CustomEvent<never>
   'reconnect-end': CustomEvent<{ success: boolean }>
 }
+
 // Interface declaration for better type hints
-export interface WebSocketManager {
+interface WebSocketManagerEventTarget {
   addEventListener<K extends keyof WebSocketManagerEventMap>(
     type: K,
     listener: (ev: WebSocketManagerEventMap[K]) => void,
@@ -33,9 +34,13 @@ export interface WebSocketManager {
     options?: boolean | AddEventListenerOptions,
   ): void
 }
-export abstract class WebSocketManager extends EventTarget {
+
+class WebSocketManagerEventTarget extends EventTarget { }
+
+export abstract class WebSocketManager {
   private _ws: WebSocket
   private promiseMap = new PromiseMap()
+  readonly e = new WebSocketManagerEventTarget()
 
   protected services = new Map<string, WebSocketService>()
 
@@ -44,7 +49,6 @@ export abstract class WebSocketManager extends EventTarget {
   }
 
   constructor(url: string | URL) {
-    super()
     this._ws = new WebSocket(url)
     this.setupWebSocket(this._ws)
   }
@@ -85,7 +89,7 @@ export abstract class WebSocketManager extends EventTarget {
 
   private async reconnect() {
     this._ws.close()
-    this.dispatchEvent(new CustomEvent('reconnect-start'))
+    this.e.dispatchEvent(new CustomEvent('reconnect-start'))
     try {
       const url = await this.fetchNewUrl()
       const newSocket = new WebSocket(url)
@@ -100,9 +104,9 @@ export abstract class WebSocketManager extends EventTarget {
         })
       }
 
-      this.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: true } }))
+      this.e.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: true } }))
     } catch (error) {
-      this.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: false } }))
+      this.e.dispatchEvent(new CustomEvent('reconnect-end', { detail: { success: false } }))
       throw error
     }
   }
@@ -134,6 +138,7 @@ export abstract class WebSocketManager extends EventTarget {
     if (this.services.has(service.name)) {
       throw new Error(`Service ${service.name} already registered`)
     }
+    service.register(this)
     this.services.set(service.name, service)
   }
 
@@ -152,22 +157,44 @@ export abstract class WebSocketManager extends EventTarget {
     return this.services.delete(serviceName)
   }
 
+  /**
+  * Sends a request message over the WebSocket connection.
+  *
+  * This method sends the provided message to the server using a WebSocket. Depending on the specified
+  * parameters, it may expect a response and handle reconnection logic if necessary.
+  *
+  * @template A - The action type of the message.
+  * @template Req - The type of the request payload.
+  * @template Res - The type of the expected response payload.
+  *
+  * @param message - The message object containing service, action, id, and the request data.
+  * @param response - A flag indicating whether a response is expected. Defaults to true.
+  * @param reconnect - A flag indicating whether to attempt reconnection if needed. Defaults to true.
+  *
+  * @returns A promise that resolves with the response data if a response is expected, or void otherwise.
+  *
+  * @throws {Error} If the service specified in the message is not registered.
+  */
   request<A extends string, Req, Res>(message: Message<A, Req>): Promise<Res>
-  request<A extends string, Req, Res>(message: Message<A, Req>, noResponse: false): Promise<Res>
-  request<A extends string, Req, _Res>(message: Message<A, Req>, noResponse: true): Promise<void>
-  /** Associate request with response */
-  async request<A extends string, Req, Res>(
+  request<A extends string, Req, Res>(message: Message<A, Req>, response: true, reconnect?: boolean): Promise<Res>
+  request<A extends string, Req, _Res>(message: Message<A, Req>, response: false, reconnect?: boolean): Promise<void>
+  request<A extends string, Req, Res>(
     message: Message<A, Req>,
-    noResponse = false,
+    response = true,
+    reconnect = true,
   ): Promise<void | Res> {
     // 确保服务已注册
     if (!this.services.has(message.service)) {
       throw new Error(`Service ${message.service} not registered`)
     }
 
-    if (noResponse) {
-      await this.sendWithReconnect(JSON.stringify(message))
-      return Promise.resolve() // TS 不知道这里对应返回值是void
+    if (!response) {
+      if (reconnect) {
+        void this.sendWithReconnect(JSON.stringify(message))
+      } else {
+        this._ws.send(JSON.stringify(message))
+      }
+      return Promise.resolve()
     } else {
       return new Promise<Res>((resolve, reject) => {
         const key = `${message.service}:${message.action}:${message.id}` as const
@@ -176,7 +203,11 @@ export abstract class WebSocketManager extends EventTarget {
           reject,
         })
 
-        void this.sendWithReconnect(JSON.stringify(message))
+        if (reconnect) {
+          void this.sendWithReconnect(JSON.stringify(message))
+        } else {
+          this._ws.send(JSON.stringify(message))
+        }
 
         setTimeout(() => reject(new Error(`Request timeout: ${key}`)), this.promiseMap.ttl)
       })

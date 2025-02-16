@@ -1,21 +1,23 @@
+import { shallowReadonly } from 'vue'
+
 import type { PTYTerminal } from './webSocketBase/ptyService'
 import type { WebShellWSManager } from './webShell/webShellWSManager'
 import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
-  private static managerMap = new Map<string, WebShellWSManager>()
+  private static managerMap = new Map<string, Readonly<WebShellWSManager>>()
 
   private constructor() {}
 
   static register(term: PTYTerminal, manager: WebShellWSManager) {
-    this.managerMap.set(term.id, manager)
+    this.managerMap.set(term.id, shallowReadonly(manager))
 
     term.loadAddon(new DragAndDropAddon(manager.uploadService))
   }
 
-  static getManager(term: PTYTerminal): WebShellWSManager | undefined
-  static getManager(id: string): WebShellWSManager | undefined
-  static getManager(catchAll: unknown): WebShellWSManager | undefined
+  static getManager(term: PTYTerminal): Readonly<WebShellWSManager> | undefined
+  static getManager(id: string): Readonly<WebShellWSManager> | undefined
+  static getManager(catchAll: unknown): Readonly<WebShellWSManager> | undefined
   static getManager(termOrId: PTYTerminal | string) {
     if (typeof termOrId === 'object') {
       return this.managerMap.get(termOrId.id)

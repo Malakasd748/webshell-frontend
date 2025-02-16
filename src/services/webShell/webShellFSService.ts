@@ -4,11 +4,10 @@ import type { TreeOption } from 'naive-ui/es/tree/src/interface'
 
 import { FSTreeNode, FSService } from '../webSocketBase/fsService'
 import type { FSEntry } from '../webSocketBase/fsService'
-import { WebSocketManager } from '../webSocketBase/webSocketManager'
 
 export class WebShellFSService extends FSService<WebShellFSTreeNode> {
-  constructor(protected override manager: WebSocketManager) {
-    super(manager, (entry, parent) => new WebShellFSTreeNode(entry, parent))
+  constructor() {
+    super((entry, parent) => new WebShellFSTreeNode(entry, parent))
   }
 
   override async rename(node: WebShellFSTreeNode) {

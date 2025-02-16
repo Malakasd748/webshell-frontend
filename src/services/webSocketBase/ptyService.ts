@@ -40,12 +40,18 @@ export interface PTYTerminal extends Terminal {
 export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocketService {
   public readonly name = 'pty'
   public terms = new Map<string, Term>()
+
   private disposables: IDisposable[] = []
+  protected manager?: WebSocketManager
 
-  constructor(protected override manager: WebSocketManager) {
-    super(manager)
+  constructor() {
+    super()
+  }
 
-    manager.addEventListener('reconnect-end', ({ detail: { success } }) => {
+  register(manager: WebSocketManager): void {
+    this.manager = manager
+
+    manager.e.addEventListener('reconnect-end', ({ detail: { success } }) => {
       if (!success) return
 
       for (const term of this.terms.values()) {
@@ -55,6 +61,8 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   }
 
   private notify<T extends PTYAction>(id: string, action: T, data: PTYActionMap[T]['request']) {
+    if (!this.manager) throw new Error('PTYService not registered')
+
     return this.manager.request<T, PTYActionMap[T]['request'], PTYActionMap[T]['response']>(
       {
         service: this.name,
@@ -62,7 +70,7 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
         id,
         data,
       },
-      true,
+      false,
     )
   }
 
@@ -71,6 +79,8 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
     action: T,
     data: PTYActionMap[T]['request'],
   ) {
+    if (!this.manager) throw new Error('PTYService not registered')
+
     return this.manager.request<T, PTYActionMap[T]['request'], PTYActionMap[T]['response']>({
       service: this.name,
       action,
@@ -105,6 +115,8 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   }
 
   addTerm(term: Term) {
+    if (!this.manager) throw new Error('PTYService not registered')
+
     this.terms.set(term.id, term)
 
     this.disposables.push(
@@ -121,13 +133,13 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
     if (this.manager.ws.readyState === WebSocket.CONNECTING) {
       const startPtyHandler = () => void this.startPty(term)
       this.manager.ws.addEventListener('open', startPtyHandler, { once: true })
-    }
-    else if (this.manager.ws.readyState === WebSocket.OPEN) {
+    } else if (this.manager.ws.readyState === WebSocket.OPEN) {
       void this.startPty(term)
     }
   }
 
   removeTerm(term: Term) {
+    if (!this.manager) throw new Error('PTYService not registered')
     if (!this.terms.delete(term.id)) return
 
     void this.notify(term.id, PTYAction.Terminate, undefined)

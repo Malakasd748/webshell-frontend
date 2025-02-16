@@ -58,11 +58,16 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
   public nodes: Node[] = []
   public showHidden = false
 
+  protected manager?: WebSocketManager
+
   constructor(
-    protected override manager: WebSocketManager,
     private nodeFactory: (entry: FSEntry, parent?: Node) => Node,
   ) {
-    super(manager)
+    super()
+  }
+
+  register(manager: WebSocketManager): void {
+    this.manager = manager
   }
 
   protected async request<T extends FSAction>(
@@ -70,6 +75,8 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
     action: T,
     data: FSActionMap[T]['request'],
   ) {
+    if (!this.manager) throw new Error('FSService not registered')
+
     return this.manager.request<T, FSActionMap[T]['request'], FSActionMap[T]['response']>({
       service: this.name,
       action,

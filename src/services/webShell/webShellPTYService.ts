@@ -3,11 +3,9 @@ import { TermManagerRegistry } from '../termManagerRegistry'
 import { WebShellWSManager } from './webShellWSManager'
 
 export class WebshellPTYService extends PTYService {
-  constructor(protected override manager: WebShellWSManager) {
-    super(manager)
-  }
-
   override addTerm(term: PTYTerminal) {
+    if (!(this.manager instanceof WebShellWSManager)) throw new Error('PTYService not registered')
+
     super.addTerm(term)
 
     TermManagerRegistry.register(term, this.manager)

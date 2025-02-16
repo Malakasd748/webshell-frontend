@@ -52,8 +52,14 @@ export class UploadService extends WebSocketService {
   readonly name = 'upload'
   waitForSetup = false
 
-  constructor(protected override manager: WebSocketManager, public sessionList: UploadSession[]) {
-    super(manager)
+  protected manager?: WebSocketManager
+
+  constructor(public sessionList: UploadSession[]) {
+    super()
+  }
+
+  register(manager: WebSocketManager): void {
+    this.manager = manager
   }
 
   private async request<T extends UploadAction>(
@@ -61,6 +67,8 @@ export class UploadService extends WebSocketService {
     action: T,
     data: UploadActionMap[T]['request'],
   ) {
+    if (!this.manager) throw new Error('manager not registered')
+
     return this.manager.request<T, UploadActionMap[T]['request'], UploadActionMap[T]['response']>({
       service: this.name,
       action,
@@ -78,8 +86,7 @@ export class UploadService extends WebSocketService {
   async dropUpload(entry: FileSystemEntry, dest: string) {
     if (entry instanceof FileSystemFileEntry) {
       await this.dropFileUpload(entry, dest)
-    }
-    else if (entry instanceof FileSystemDirectoryEntry) {
+    } else if (entry instanceof FileSystemDirectoryEntry) {
       await this.dropDirectoryUpload(entry, dest)
     }
     throw new TypeError('invalid parameter')
@@ -101,16 +108,13 @@ export class UploadService extends WebSocketService {
     if (type === 'file') {
       if ('showOpenFilePicker' in window) {
         await this.filePickerUpload(dest)
-      }
-      else {
+      } else {
         await this.inputFileUpload(dest)
       }
-    }
-    else if (type === 'directory') {
+    } else if (type === 'directory') {
       if ('showDirectoryPicker' in window) {
         await this.directoryPickerUpload(dest)
-      }
-      else {
+      } else {
         await this.inputDirectoryUpload(dest)
       }
     }
@@ -153,8 +157,7 @@ export class UploadService extends WebSocketService {
           }
           await Promise.all(promises)
           resolve()
-        }
-        catch (err) {
+        } catch (err) {
           reject(err as Error)
         }
       }
@@ -189,13 +192,16 @@ export class UploadService extends WebSocketService {
   }
 
   private async doStartUpload(session: UploadSession) {
+    if (!this.manager) throw new Error('manager not registered')
+
     const { needConfirm } = await this.request(session.path, UploadAction.StartSession, {})
     if (needConfirm) {
       const policy = await new Promise<DuplicatePolicy>((resolve, reject) => {
         session.resolveConfirm = resolve
         session.rejectConfirm = reject
         // TODO: 使用自定义的消息类
-        this.manager.dispatchEvent(new CustomEvent('upload-need-confirm', { detail: session }))
+        if (!this.manager) throw new Error('manager not registered')
+        this.manager.e.dispatchEvent(new CustomEvent('upload-need-confirm', { detail: session }))
       }).catch(() => undefined) // reject代表取消
       if (policy === undefined) return
       await this.request(session.path, UploadAction.StartSession, { policy })
@@ -226,8 +232,7 @@ export class UploadService extends WebSocketService {
         if (session.type === 'directory') {
           session.doneFilesCount += 1
           session.doneSize += entry.file.size
-        }
-        else {
+        } else {
           // 上传任务为文件，且策略为“跳过”时，文件任务从列表中消失
           const idx = this.sessionList.indexOf(session)
           if (idx > -1) {
@@ -299,7 +304,7 @@ export class UploadSession {
   private _entries: UploadEntry[] = []
   private _status: SessionStatus = undefined
   private _totalSize = 0
-  private _totalFiles = 0
+  private _totalFilesCount = 0
   private _setupFinished = false
 
   constructor(
@@ -323,8 +328,8 @@ export class UploadSession {
     return this._totalSize
   }
 
-  get totalFiles(): number {
-    return this._totalFiles
+  get totalFilesCount(): number {
+    return this._totalFilesCount
   }
 
   get setupFinished(): boolean {
@@ -379,23 +384,17 @@ export class UploadSession {
     let promise: Promise<void> = Promise.resolve()
     if (arg instanceof File) {
       promise = this.setupFile(arg)
-    }
-    else if (arg instanceof FileList) {
+    } else if (arg instanceof FileList) {
       promise = this.setupFileList(arg)
-    }
-    else if (arg instanceof FileSystemFileEntry) {
+    } else if (arg instanceof FileSystemFileEntry) {
       promise = this.setupFileEntry(arg)
-    }
-    else if (arg instanceof FileSystemDirectoryEntry) {
+    } else if (arg instanceof FileSystemDirectoryEntry) {
       promise = this.setupDirectoryEntry(arg)
-    }
-    else if (arg instanceof FileSystemFileHandle) {
+    } else if (arg instanceof FileSystemFileHandle) {
       promise = this.setupFileHandle(arg)
-    }
-    else if (arg instanceof FileSystemDirectoryHandle) {
+    } else if (arg instanceof FileSystemDirectoryHandle) {
       promise = this.setupDirectoryHandle(arg)
-    }
-    else {
+    } else {
       promise = Promise.reject(new Error('invalid session setup argument'))
     }
     promise = promise
@@ -413,7 +412,7 @@ export class UploadSession {
 
   private countFile(path: string, file: File) {
     this._totalSize += file.size
-    this._totalFiles += 1
+    this._totalFilesCount += 1
     this._entries.push({ path, isDir: false, file })
   }
 
@@ -443,8 +442,7 @@ export class UploadSession {
           (entry as FileSystemFileEntry).file(resolve, reject),
         )
         this.countFile(join(parent, entry.name), file)
-      }
-      else if (entry.isDirectory) {
+      } else if (entry.isDirectory) {
         const reader = (entry as FileSystemDirectoryEntry).createReader()
 
         let isFirstRead = true
@@ -484,15 +482,13 @@ export class UploadSession {
       if (handle.kind === 'file') {
         const file = await (handle as FileSystemFileHandle).getFile()
         this.countFile(join(parent, file.name), file)
-      }
-      else if (handle.kind === 'directory') {
+      } else if (handle.kind === 'directory') {
         const generator = (handle as FileSystemDirectoryHandle).values()
         const { value: firstChild, done } = await generator.next()
         if (done) {
           // 空文件夹
           this._entries.push({ path: join(parent, handle.name), isDir: true })
-        }
-        else {
+        } else {
           await setupHandle(join(parent, handle.name), firstChild)
           for await (const child of generator) {
             await setupHandle(join(parent, handle.name), child)

@@ -31,7 +31,7 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
   async function addTerm(
     resourceOrId: string | WebShellResource | undefined = resourceStore.selectedResource,
   ) {
-    if (!resourceOrId) {
+    if (resourceOrId === undefined) {
       throw new Error('No resource selected')
     }
 
@@ -43,10 +43,13 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
       throw new Error('invalid resource id')
     }
 
-    const wsUrl = await resource.getWsUrl()
-    const manager = new WebShellWSManager(wsUrl, resource)
+    let manager = resource.manager
+    if (!manager) {
+      const wsUrl = await resource.getWsUrl()
+      manager = new WebShellWSManager(wsUrl, resource)
+    }
 
-    const term = Term.new()
+    const term = new Term()
     manager.ptyService.addTerm(term)
 
     watchEffect(() => {

@@ -1,6 +1,6 @@
 import { useEventListener } from '@vueuse/core'
 
-import { HpcResource, type HpcResourceInit } from '@/models/hpcResource'
+import type { WebShellResource, WebShellResourceInit } from '@/models/resources/webShellResource'
 import { useWebShellTermStore } from '@/stores/webShellTerm'
 
 interface Message {
@@ -17,7 +17,7 @@ export function webshellNotifyOpenerReady() {
 }
 
 /** 确保函数在 vue component 语境下调用 */
-export function setupWebshell() {
+export function setupWebshell(factory: (init: unknown) => WebShellResource) {
   useEventListener(window, 'message', (ev: { data?: { webshell?: Message } }) => {
     if (!ev.data?.webshell) return
 
@@ -25,14 +25,13 @@ export function setupWebshell() {
 
     const { action, data } = ev.data.webshell
     if (action === 'open') {
-      const resource = data as HpcResourceInit
-      void termStore.addTerm(new HpcResource(resource))
+      void termStore.addTerm(factory(data))
     }
   })
 }
 
 /** 确保函数在 vue component 语境下调用 */
-export function setupOpener(webshellWindow: Window, data: HpcResourceInit) {
+export function setupOpener(webshellWindow: Window, data: WebShellResourceInit) {
   useEventListener(
     window,
     'message',
@@ -50,6 +49,6 @@ export function setupOpener(webshellWindow: Window, data: HpcResourceInit) {
   )
 }
 
-export function openerNotifyWebshellOpen(webshellWindow: Window, data: HpcResourceInit) {
+export function openerNotifyWebshellOpen(webshellWindow: Window, data: WebShellResourceInit) {
   webshellWindow.postMessage({ webshell: { action: 'open', data } })
 }

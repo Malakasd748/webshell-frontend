@@ -6,18 +6,22 @@ import type { UploadSession, DuplicatePolicy } from '../webSocketBase/uploadServ
 import type { WebShellWSManager } from './webShellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 
-// 利用 TypeScript 的声明合并，扩展 WebshellWSManager 的事件类型
-declare module './webShellWSManager' {
-  interface WebShellWSManagerEventMap {
+// 利用 TypeScript 的声明合并，扩展事件类型
+declare module '../webSocketBase/webSocketManager' {
+  interface WebSocketManagerEventMap {
     'upload-need-confirm': CustomEvent<UploadSession>
   }
 }
 
 export class WebShellUploadService extends UploadService {
-  constructor(manager: WebShellWSManager, sessions: UploadSession[]) {
-    super(manager, sessions)
+  constructor(sessions: UploadSession[]) {
+    super(sessions)
+  }
 
-    manager.addEventListener('upload-need-confirm', ({ detail: session }) => {
+  override register(manager: WebShellWSManager) {
+    super.register(manager)
+
+    manager.e.addEventListener('upload-need-confirm', ({ detail: session }) => {
       doConfirm(session).then(
         policy => session.resolveConfirm(policy),
         () => session.rejectConfirm(new Error()),
