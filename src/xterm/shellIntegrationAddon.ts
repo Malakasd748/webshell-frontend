@@ -167,29 +167,29 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     // 阻止默认的三击选择行为
     event.preventDefault()
 
-    console.log('triple click')
-
     // 获取点击位置对应的行号
+    // @ts-expect-error using private api
+    // eslint-disable-next-line
     const position = this.terminal._core._mouseService.getMouseReportCoords(event, this.terminal.element)
-    console.log(position)
+    // 将视口相对行数转换为 buffer 中的绝对行数
+    // eslint-disable-next-line
+    const clickedLine: number = position.row + this.terminal.buffer.active.viewportY
 
     // 查找点击位置所在的语义区域
-    // const zone = this.findZoneByLine(clickedLine)
-    // console.log(this.zones)
-    // if (!zone || zone.endLine === undefined) return
+    const zone = this.findZoneByLine(clickedLine)
+    if (!zone || zone.endLine === undefined) return
 
-    // // 如果点击在命令输出区域内，选择输出文本
-    // if (zone.output && clickedLine >= zone.output.start.y && clickedLine <= zone.output.end.y) {
-    //   const startPos = zone.output.start
-    //   const endPos = zone.output.end
-    //   const length = (endPos.y - startPos.y) * (this.terminal.cols + 1) + (endPos.x - startPos.x)
-    //   this.terminal.select(startPos.x, startPos.y, length)
-    // } else {
-    //   // 默认选择整个区域
-    //   const totalLength = (zone.endLine - zone.startLine + 1) * (this.terminal.cols + 1)
-    //   this.terminal.select(0, zone.startLine, totalLength)
-    // }
-    // console.log(zone)
+    // 如果点击在命令输出区域内，选择输出文本
+    if (zone.output && clickedLine >= zone.output.start.y && clickedLine <= zone.output.end.y) {
+      const startPos = zone.output.start
+      const endPos = zone.output.end
+      const length = (endPos.y - startPos.y) * this.terminal.cols + (endPos.x - startPos.x)
+      this.terminal.select(startPos.x, startPos.y, length)
+    } else {
+      // 默认选择整个区域
+      const totalLength = (zone.endLine - zone.startLine) * this.terminal.cols
+      this.terminal.select(0, zone.startLine, totalLength)
+    }
   }
 
   private findZoneByLine(line: number): SemanticZone | undefined {
@@ -224,7 +224,7 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     }
 
     const [command, ...args] = data.split(';')
-    const currentLine = this.buffer.cursorY
+    const currentLine = this.buffer.cursorY + this.terminal.buffer.active.viewportY
     const currentCol = this.buffer.cursorX
 
     switch (command) {
