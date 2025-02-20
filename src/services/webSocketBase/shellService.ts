@@ -35,6 +35,7 @@ interface ShellActionMap {
 export interface ShellTerminal extends Terminal {
   id: string
   fit(): void
+  cwd: string
 }
 
 export class ShellService<Term extends ShellTerminal = ShellTerminal> extends WebSocketService {
@@ -55,7 +56,7 @@ export class ShellService<Term extends ShellTerminal = ShellTerminal> extends We
       if (!success) return
 
       for (const term of this.terms.values()) {
-        void this.startPty(term)
+        void this.startShell(term)
       }
     })
   }
@@ -108,8 +109,12 @@ export class ShellService<Term extends ShellTerminal = ShellTerminal> extends We
     term.write(data)
   }
 
-  private async startPty(term: Term) {
-    await this.request(term.id, ShellAction.Start, { cwd: '' })
+  protected getLastActiveShell(): Term | undefined {
+    return undefined
+  }
+
+  private async startShell(term: Term) {
+    await this.request(term.id, ShellAction.Start, { cwd: this.getLastActiveShell()?.cwd || '' })
     term.fit()
     void this.notify(term.id, ShellAction.Resize, { cols: term.cols, rows: term.rows })
   }
@@ -131,10 +136,9 @@ export class ShellService<Term extends ShellTerminal = ShellTerminal> extends We
     )
 
     if (this.manager.ws.readyState === WebSocket.CONNECTING) {
-      const startPtyHandler = () => void this.startPty(term)
-      this.manager.ws.addEventListener('open', startPtyHandler, { once: true })
+      this.manager.ws.addEventListener('open', () => this.startShell(term), { once: true })
     } else if (this.manager.ws.readyState === WebSocket.OPEN) {
-      void this.startPty(term)
+      void this.startShell(term)
     }
   }
 

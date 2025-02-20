@@ -32,6 +32,7 @@ export class Term extends Terminal implements ShellTerminal {
 
     reactiveThis.setupAddons()
     Term.newTermCallbacks.forEach(cb => cb(reactiveThis))
+
     return reactiveThis
   }
 

@@ -1,6 +1,7 @@
 import { ShellService, type ShellTerminal } from '../websocketBase/shellService'
 import { TermManagerRegistry } from '../termManagerRegistry'
 import { WebShellWSManager } from './webShellWSManager'
+import { useWebShellTermStore } from '@/stores/webshellTerm'
 
 export class WebshellShellService extends ShellService {
   override addTerm(term: ShellTerminal) {
@@ -9,5 +10,9 @@ export class WebshellShellService extends ShellService {
     super.addTerm(term)
 
     TermManagerRegistry.register(term, this.manager)
+  }
+
+  protected override getLastActiveShell(): ShellTerminal | undefined {
+    return useWebShellTermStore().lastFocusedTerm
   }
 }
