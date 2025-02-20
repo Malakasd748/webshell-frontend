@@ -16,7 +16,7 @@
 <script setup lang="ts">
   import { NGrid, NGi } from 'naive-ui'
 
-  import { availableThemes } from '@/stores/webShellSettings'
+  import { availableThemes } from '@/stores/webshellSettings'
   import ThemePreview from './ThemePreview.vue'
 </script>
 

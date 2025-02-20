@@ -1,16 +1,16 @@
 import { shallowReactive } from 'vue'
 
-import { WebSocketManager } from '../webSocketBase/webSocketManager'
-import { WebshellPTYService } from './webShellPTYService'
-import { WebShellFSService } from './webShellFSService'
-import { WebShellUploadService } from './webShellUploadService'
-import { WebShellHeartbeatService } from './webShellHeartbeatService'
-import { useWebShellUploadStore } from '@/stores/webShellUpload'
-import type { UploadSession } from '../webSocketBase/uploadService'
-import { WebShellResource } from '@/models/resources/webShellResource'
+import { WebSocketManager } from '../websocketBase/webSocketManager'
+import { WebshellShellService } from './webshellShellService'
+import { WebShellFSService } from './webshellFSService'
+import { WebShellUploadService } from './webshellUploadService'
+import { WebShellHeartbeatService } from './webshellHeartbeatService'
+import { useWebShellUploadStore } from '@/stores/webshellUpload'
+import type { UploadSession } from '../websocketBase/uploadService'
+import { WebShellResource } from '@/models/resources/webshellResource'
 
 export class WebShellWSManager extends WebSocketManager {
-  ptyService: WebshellPTYService
+  ptyService: WebshellShellService
   fsService: WebShellFSService
   uploadService: WebShellUploadService
   heartbeatService: WebShellHeartbeatService
@@ -19,7 +19,7 @@ export class WebShellWSManager extends WebSocketManager {
   constructor(url: string | URL, readonly resource: WebShellResource) {
     super(url)
 
-    this.ptyService = new WebshellPTYService()
+    this.ptyService = new WebshellShellService()
     this.fsService = new WebShellFSService()
     this.heartbeatService = new WebShellHeartbeatService()
 

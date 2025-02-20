@@ -1,7 +1,7 @@
 import { h, shallowReactive } from 'vue'
 
-import { UploadService, UploadSession } from '../webSocketBase/uploadService'
-import type { DuplicatePolicy } from '../webSocketBase/uploadService'
+import { UploadService, UploadSession } from '../websocketBase/uploadService'
+import type { DuplicatePolicy } from '../websocketBase/uploadService'
 import type { WebShellWSManager } from './webShellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 import naiveApi from '@/providers/naiveApi'
@@ -15,7 +15,7 @@ declare module '../webSocketBase/webSocketManager' {
 
 export class WebShellUploadService extends UploadService {
   constructor(sessions: UploadSession[]) {
-    super(sessions, (service, type, name, dest) => shallowReactive(new UploadSession(service, type, name, dest)))
+    super(sessions, (...args) => shallowReactive(new UploadSession(...args)))
   }
 
   override register(manager: WebShellWSManager) {

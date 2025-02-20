@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 
-import type { WebShellResource, WebShellResourceInit } from '@/models/resources/webShellResource'
-import { useWebShellTermStore } from '@/stores/webShellTerm'
+import type { WebShellResource, WebShellResourceInit } from '@/models/resources/webshellResource'
+import { useWebShellTermStore } from '@/stores/webshellTerm'
 
 interface Message {
   action: string

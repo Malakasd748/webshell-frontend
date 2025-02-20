@@ -1,7 +1,5 @@
-import { join } from 'pathe'
-
 import type { WebSocketManager } from './webSocketManager'
-import { WebSocketService } from './webSocketServiceBase'
+import { WebSocketService } from './websocketServiceBase'
 
 const enum FSAction {
   List = 'list',
@@ -29,7 +27,7 @@ interface FSActionMap {
   }
   [FSAction.GetRoot]: {
     request: void
-    response: FSEntry
+    response: FSEntry[]
   }
   [FSAction.Rename]: {
     request: { newName: string }
@@ -108,7 +106,7 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
   }
 
   async create(parent: Node, isDir: boolean, name: string) {
-    await this.request(join(parent.path, name), FSAction.Create, { name, isDir })
+    await this.request(parent.path, FSAction.Create, { name, isDir })
     await this.getChildren(parent)
   }
 
@@ -126,8 +124,8 @@ export class FSService<Node extends FSTreeNode<Node>> extends WebSocketService {
   }
 
   async getRoot() {
-    const entry = await this.request('/', FSAction.GetRoot, undefined)
-    this.nodes = [this.nodeFactory(entry)]
+    const entries = await this.request('/', FSAction.GetRoot, undefined)
+    this.nodes = entries.map(entry => this.nodeFactory(entry))
   }
 
   getNodeByPathBFS(path: string) {

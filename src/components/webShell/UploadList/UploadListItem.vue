@@ -146,7 +146,7 @@
   } from 'naive-ui'
   import { useEventListener } from '@vueuse/core'
 
-  import type { UploadSession, SessionStatus } from '@/services/webSocketBase/uploadService'
+  import type { UploadSession, SessionStatus } from '@/services/websocketBase/uploadService'
   import SpinnerImg from '#assets/images/webshell/spinner.png'
 
   const { session } = defineProps<{ session: UploadSession }>()

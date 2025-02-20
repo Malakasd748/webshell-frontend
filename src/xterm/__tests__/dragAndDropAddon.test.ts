@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { DragAndDropAddon } from '../dragAndDropAddon'
-import { UploadService } from '../../services/webSocketBase/uploadService'
+import { UploadService, UploadSession } from '../../services/websocketBase/uploadService'
 import type { Term } from '..'
 
 // Mock DragEvent for Node.js environment
@@ -17,7 +17,7 @@ global.DragEvent = MockDragEvent as any
 
 class MockUploadService extends UploadService {
   constructor() {
-    super([])
+    super([], (...args) => new UploadSession(...args))
   }
 
   readonly name = 'upload'

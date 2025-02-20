@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { CacheMap } from '@/utils/cacheMap'
-import type { WebSocketService } from './webSocketServiceBase'
+import type { WebSocketService } from './websocketServiceBase'
 
 export interface Message<Action = string, Data = unknown> {
   service: string

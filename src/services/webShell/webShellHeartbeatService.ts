@@ -1,6 +1,6 @@
 import { useTimeoutPoll } from '@vueuse/core'
 
-import { WebSocketService } from '../webSocketBase/webSocketServiceBase'
+import { WebSocketService } from '../websocketBase/websocketServiceBase'
 import type { WebShellWSManager } from './webShellWSManager'
 
 export class WebShellHeartbeatService extends WebSocketService {

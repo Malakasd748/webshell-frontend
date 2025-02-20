@@ -89,9 +89,9 @@
   import { NButton, NLayout, NLayoutFooter, NLayoutHeader, NLayoutSider } from 'naive-ui'
   import { computed, ref, useTemplateRef, watchEffect, onMounted } from 'vue'
 
-  import { useWebShellStateStore } from '../stores/webShellStates'
-  import { useWebShellTermStore } from '../stores/webShellTerm'
-  import { useWebShellResourceStore } from '../stores/webShellResource'
+  import { useWebShellStateStore } from '../stores/webshellStates'
+  import { useWebShellTermStore } from '../stores/webshellTerm'
+  import { useWebShellResourceStore } from '../stores/webshellResource'
   import TermBody from '@/components/webShell/TermBody'
   import TermFooter from '@/components/webShell/TermFooter'
   import TermHeader from '@/components/webShell/TermHeader'

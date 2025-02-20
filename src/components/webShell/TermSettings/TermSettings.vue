@@ -28,7 +28,7 @@
   import type { SelectOption } from 'naive-ui'
 
   import ThemePreviewGroup from './ThemePreviewGroup.vue'
-  import { useWebShellSettingStore } from '@/stores/webShellSettings'
+  import { useWebShellSettingStore } from '@/stores/webshellSettings'
 
   const settingsStore = useWebShellSettingStore()
 

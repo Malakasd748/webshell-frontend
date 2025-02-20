@@ -42,8 +42,8 @@
   import { storeToRefs } from 'pinia'
 
   import UploadList from '../UploadList'
-  import { useWebShellUploadStore } from '@/stores/webShellUpload'
-  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import { useWebShellUploadStore } from '@/stores/webshellUpload'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
   import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
   const webshellUploadStore = useWebShellUploadStore()

@@ -1,7 +1,7 @@
 import { join } from 'pathe'
 import { createSHA256 } from 'hash-wasm'
 
-import { WebSocketService } from './webSocketServiceBase'
+import { WebSocketService } from './websocketServiceBase'
 import type { WebSocketManager } from './webSocketManager'
 
 enum UploadAction {

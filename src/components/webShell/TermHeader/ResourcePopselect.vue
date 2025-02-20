@@ -19,8 +19,8 @@
   import { computed } from 'vue'
   import { NPopselect, popselectProps, NSpin, NEmpty } from 'naive-ui'
 
-  import { useWebShellResourceStore } from '@/stores/webShellResource'
-  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import { useWebShellResourceStore } from '@/stores/webshellResource'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
   // import { webshellNotifyOpenerReady, setupWebshell } from '@/utils/webShell/windowMessage'
 
   const props = defineProps(popselectProps)

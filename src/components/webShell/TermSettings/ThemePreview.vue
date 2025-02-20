@@ -32,7 +32,7 @@
   import { Terminal } from '@xterm/xterm'
   import { FitAddon } from '@xterm/addon-fit'
 
-  import { availableThemes, useWebShellSettingStore } from '@/stores/webShellSettings'
+  import { availableThemes, useWebShellSettingStore } from '@/stores/webshellSettings'
 
   const { themeName } = defineProps<{ themeName: string }>()
 

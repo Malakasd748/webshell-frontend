@@ -16,7 +16,7 @@
   import { NSpin } from 'naive-ui'
 
   import type { Term } from '@/xterm'
-  import { useWebShellSettingStore } from '@/stores/webShellSettings'
+  import { useWebShellSettingStore } from '@/stores/webshellSettings'
   import { TermManagerRegistry } from '@/services/termManagerRegistry'
 
   const settingsStore = useWebShellSettingStore()

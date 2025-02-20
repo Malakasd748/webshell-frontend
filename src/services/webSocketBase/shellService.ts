@@ -1,44 +1,44 @@
 import type { IDisposable, Terminal } from '@xterm/xterm'
 
-import { WebSocketService } from './webSocketServiceBase'
+import { WebSocketService } from './websocketServiceBase'
 import type { WebSocketManager } from './webSocketManager'
 
-const enum PTYAction {
+const enum ShellAction {
   Command = 'command',
   Resize = 'resize',
   Start = 'start',
   Terminate = 'terminate',
 }
 
-interface PTYActionMap {
-  [PTYAction.Command]: {
+interface ShellActionMap {
+  [ShellAction.Command]: {
     request: string
     response: string
   }
-  [PTYAction.Resize]: {
+  [ShellAction.Resize]: {
     request: { cols: number, rows: number }
     response: void
   }
-  [PTYAction.Start]: {
+  [ShellAction.Start]: {
     request: {
       cwd: string
     }
     response: void
   }
-  [PTYAction.Terminate]: {
+  [ShellAction.Terminate]: {
     request: void
     response: void
   }
 }
 
 /** 将具体的 XTerm 实现从 PTY 服务中解耦 */
-export interface PTYTerminal extends Terminal {
+export interface ShellTerminal extends Terminal {
   id: string
   fit(): void
 }
 
-export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocketService {
-  public readonly name = 'pty'
+export class ShellService<Term extends ShellTerminal = ShellTerminal> extends WebSocketService {
+  public readonly name = 'shell'
   public terms = new Map<string, Term>()
 
   private disposables: IDisposable[] = []
@@ -60,10 +60,10 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
     })
   }
 
-  private notify<T extends PTYAction>(id: string, action: T, data: PTYActionMap[T]['request']) {
+  private notify<T extends ShellAction>(id: string, action: T, data: ShellActionMap[T]['request']) {
     if (!this.manager) throw new Error('PTYService not registered')
 
-    return this.manager.request<T, PTYActionMap[T]['request'], PTYActionMap[T]['response']>(
+    return this.manager.request<T, ShellActionMap[T]['request'], ShellActionMap[T]['response']>(
       {
         service: this.name,
         action,
@@ -74,14 +74,14 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
     )
   }
 
-  private async request<T extends PTYAction>(
+  private async request<T extends ShellAction>(
     id: string,
     action: T,
-    data: PTYActionMap[T]['request'],
+    data: ShellActionMap[T]['request'],
   ) {
-    if (!this.manager) throw new Error('PTYService not registered')
+    if (!this.manager) throw new Error('ShellService not registered')
 
-    return this.manager.request<T, PTYActionMap[T]['request'], PTYActionMap[T]['response']>({
+    return this.manager.request<T, ShellActionMap[T]['request'], ShellActionMap[T]['response']>({
       service: this.name,
       action,
       id,
@@ -93,9 +93,9 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
     this.disposables.forEach(d => d.dispose())
   }
 
-  override handleAction(action: PTYAction, id: string, data: PTYActionMap[typeof action]['response']): void {
+  override handleAction(action: ShellAction, id: string, data: ShellActionMap[typeof action]['response']): void {
     switch (action) {
-      case PTYAction.Command:
+      case ShellAction.Command:
         this.handleCommand(id, data as string)
         break
     }
@@ -109,24 +109,24 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   }
 
   private async startPty(term: Term) {
-    await this.request(term.id, PTYAction.Start, { cwd: '' })
+    await this.request(term.id, ShellAction.Start, { cwd: '' })
     term.fit()
-    void this.notify(term.id, PTYAction.Resize, { cols: term.cols, rows: term.rows })
+    void this.notify(term.id, ShellAction.Resize, { cols: term.cols, rows: term.rows })
   }
 
   addTerm(term: Term) {
-    if (!this.manager) throw new Error('PTYService not registered')
+    if (!this.manager) throw new Error('ShellService not registered')
 
     this.terms.set(term.id, term)
 
     this.disposables.push(
       term.onData((data) => {
-        void this.notify(term.id, PTYAction.Command, data)
+        void this.notify(term.id, ShellAction.Command, data)
       }),
     )
     this.disposables.push(
       term.onResize((data) => {
-        void this.notify(term.id, PTYAction.Resize, data)
+        void this.notify(term.id, ShellAction.Resize, data)
       }),
     )
 
@@ -139,10 +139,10 @@ export class PTYService<Term extends PTYTerminal = PTYTerminal> extends WebSocke
   }
 
   removeTerm(term: Term) {
-    if (!this.manager) throw new Error('PTYService not registered')
+    if (!this.manager) throw new Error('ShellService not registered')
     if (!this.terms.delete(term.id)) return
 
-    void this.notify(term.id, PTYAction.Terminate, undefined)
+    void this.notify(term.id, ShellAction.Terminate, undefined)
     if (this.terms.size === 0) {
       this.manager.ws.close()
     }

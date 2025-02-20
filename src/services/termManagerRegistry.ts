@@ -1,24 +1,24 @@
 import { shallowReadonly } from 'vue'
 
-import type { PTYTerminal } from './webSocketBase/ptyService'
-import type { WebShellWSManager } from './webShell/webShellWSManager'
+import type { ShellTerminal } from './websocketBase/shellService'
+import type { WebShellWSManager } from './webshell/webShellWSManager'
 import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
-  private static managerMap = new Map<string, Readonly<WebShellWSManager>>()
+  private static managerMap = new Map<string, WebShellWSManager>()
 
   private constructor() {}
 
-  static register(term: PTYTerminal, manager: WebShellWSManager) {
-    this.managerMap.set(term.id, shallowReadonly(manager))
+  static register(term: ShellTerminal, manager: WebShellWSManager) {
+    this.managerMap.set(term.id, shallowReadonly(manager) as WebShellWSManager)
 
     term.loadAddon(new DragAndDropAddon(manager.uploadService))
   }
 
-  static getManager(term: PTYTerminal): Readonly<WebShellWSManager> | undefined
-  static getManager(id: string): Readonly<WebShellWSManager> | undefined
-  static getManager(catchAll: unknown): Readonly<WebShellWSManager> | undefined
-  static getManager(termOrId: PTYTerminal | string) {
+  static getManager(term: ShellTerminal): WebShellWSManager | undefined
+  static getManager(id: string): WebShellWSManager | undefined
+  static getManager(catchAll: unknown): WebShellWSManager | undefined
+  static getManager(termOrId: ShellTerminal | string) {
     if (typeof termOrId === 'object') {
       return this.managerMap.get(termOrId.id)
     } else if (typeof termOrId === 'string') {
@@ -28,7 +28,7 @@ export class TermManagerRegistry {
     }
   }
 
-  static unregister(term: PTYTerminal) {
+  static unregister(term: ShellTerminal) {
     const socket = this.managerMap.get(term.id)
     socket?.ptyService.removeTerm(term)
     return this.managerMap.delete(term.id)

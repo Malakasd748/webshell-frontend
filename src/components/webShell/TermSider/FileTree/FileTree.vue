@@ -49,9 +49,9 @@
   import { FileTreeContextMenu } from './contextMenu'
   import type { ContextMenuActions, ContextMenuOption } from './contextMenu'
   import FileTreeNodeEdit from './FileTreeNodeEdit.vue'
-  import type { WebShellWSManager } from '@/services/webShell/webShellWSManager'
-  import type { WebShellFSTreeNode } from '@/services/webShell/webShellFSService'
-  import { useWebShellTermStore } from '@/stores/webShellTerm'
+  import type { WebShellWSManager } from '@/services/webshell/webShellWSManager'
+  import type { WebShellFSTreeNode } from '@/services/webshell/webshellFSService'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
   import naiveApi from '@/providers/naiveApi'
 
   const { manager, showHiddenFiles = false } = defineProps<{

@@ -3,10 +3,10 @@ import { useEventListener } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
 import { Term } from '../xterm'
-import { WebShellResource } from '@/models/resources/webShellResource'
-import { WebShellWSManager } from '@/services/webShell/webShellWSManager'
-import { useWebShellResourceStore } from './webShellResource'
-import { useWebShellSettingStore } from './webShellSettings'
+import { WebShellResource } from '@/models/resources/webshellResource'
+import { WebShellWSManager } from '@/services/webshell/webShellWSManager'
+import { useWebShellResourceStore } from './webshellResource'
+import { useWebShellSettingStore } from './webshellSettings'
 
 export const useWebShellTermStore = defineStore('webshell-term', () => {
   const resourceStore = useWebShellResourceStore()

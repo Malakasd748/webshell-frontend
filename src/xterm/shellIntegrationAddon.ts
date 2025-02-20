@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-import type { ITerminalAddon, IDisposable, IBuffer } from '@xterm/xterm'
+import type { ITerminalAddon, IDisposable, IBuffer, IBufferRange } from '@xterm/xterm'
+import { useEventListener } from '@vueuse/core'
 
 import type { Term } from '.'
 
@@ -85,11 +86,34 @@ const enum ITermOscPt {
   CurrentDir = 'CurrentDir',
 }
 
+/**
+ * 表示一个完整的命令执行周期，包含提示符、命令输入、执行输出等位置信息
+ */
 interface SemanticZone {
-  type: FinalTermOscPt
-  startLine: number
-  endLine?: number
+  /**
+   * 提示符区域
+   */
+  prompt?: IBufferRange
+  /**
+   * 命令输入区域
+   */
+  command?: IBufferRange
+  /**
+   * 命令输出区域
+   */
+  output?: IBufferRange
+  /**
+   * 命令退出码
+   */
   exitCode?: string
+  /**
+   * 整个区域的起始行
+   */
+  startLine: number
+  /**
+   * 整个区域的结束行
+   */
+  endLine?: number
 }
 
 /**
@@ -130,9 +154,11 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     )
 
     // 注册三击选择事件处理
-    this.terminal.element?.addEventListener('mousedown', this.handleMouseDown.bind(this))
+    const dispose = useEventListener(() => terminal.container, 'mousedown', ev => this.handleMouseDown(ev))
+    this.disposables.push({ dispose })
   }
 
+  // TODO
   private handleMouseDown(event: MouseEvent) {
     if (!this.terminal || event.detail !== 3) {
       return
@@ -141,27 +167,29 @@ export class ShellIntegrationAddon implements ITerminalAddon {
     // 阻止默认的三击选择行为
     event.preventDefault()
 
-    // 获取点击位置对应的行号
-    const element = event.target as HTMLElement
-    const rect = element.getBoundingClientRect()
-    const y = event.clientY - rect.top
+    console.log('triple click')
 
-    // 计算行号，修正计算行高的括号优先级
-    const rowHeight = (this.terminal.element?.clientHeight ?? 0) / this.terminal.rows
-    const clickedLine = Math.floor(y / rowHeight)
+    // 获取点击位置对应的行号
+    const position = this.terminal._core._mouseService.getMouseReportCoords(event, this.terminal.element)
+    console.log(position)
 
     // 查找点击位置所在的语义区域
-    const zone = this.findZoneByLine(clickedLine)
-    if (!zone || zone.endLine === undefined) return
+    // const zone = this.findZoneByLine(clickedLine)
+    // console.log(this.zones)
+    // if (!zone || zone.endLine === undefined) return
 
-    // 计算选区长度（考虑换行符）
-    // 选区长度 = 总列数 + 每行末尾的换行符（\r\n或\n，取决于平台）
-    const lineCount = zone.endLine - zone.startLine + 1
-    const newlineLength = 1 // \n 的长度为 1
-    const totalLength = (this.terminal.cols + newlineLength) * (lineCount - 1) + this.terminal.cols
-
-    // 设置选区 - select(column, row, length)
-    this.terminal.select(0, zone.startLine, totalLength)
+    // // 如果点击在命令输出区域内，选择输出文本
+    // if (zone.output && clickedLine >= zone.output.start.y && clickedLine <= zone.output.end.y) {
+    //   const startPos = zone.output.start
+    //   const endPos = zone.output.end
+    //   const length = (endPos.y - startPos.y) * (this.terminal.cols + 1) + (endPos.x - startPos.x)
+    //   this.terminal.select(startPos.x, startPos.y, length)
+    // } else {
+    //   // 默认选择整个区域
+    //   const totalLength = (zone.endLine - zone.startLine + 1) * (this.terminal.cols + 1)
+    //   this.terminal.select(0, zone.startLine, totalLength)
+    // }
+    // console.log(zone)
   }
 
   private findZoneByLine(line: number): SemanticZone | undefined {
@@ -197,59 +225,59 @@ export class ShellIntegrationAddon implements ITerminalAddon {
 
     const [command, ...args] = data.split(';')
     const currentLine = this.buffer.cursorY
+    const currentCol = this.buffer.cursorX
 
     switch (command) {
       case FinalTermOscPt.PromptStart: {
-        // 如果有未结束的区域，关闭它
-        if (this.currentZone) {
-          this.currentZone.endLine = currentLine - 1
-        }
-
+        // 开始一个新的语义区域
         this.currentZone = {
-          type: FinalTermOscPt.PromptStart,
           startLine: currentLine,
+          prompt: {
+            start: { x: 0, y: currentLine },
+            end: { x: 0, y: currentLine }, // 结束位置将在 CommandStart 时更新
+          },
         }
         this.zones.push(this.currentZone)
         this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandStart: {
-        if (this.currentZone?.type === FinalTermOscPt.PromptStart) {
-          this.currentZone.endLine = currentLine - 1
+        if (this.currentZone?.prompt) {
+          // 更新提示符区域的结束位置
+          this.currentZone.prompt.end = { x: currentCol, y: currentLine }
+          // 开始记录命令输入区域
+          this.currentZone.command = {
+            start: { x: currentCol, y: currentLine },
+            end: { x: currentCol, y: currentLine }, // 结束位置将在 CommandExecuted 时更新
+          }
         }
-
-        this.currentZone = {
-          type: FinalTermOscPt.CommandStart,
-          startLine: currentLine,
-        }
-        this.zones.push(this.currentZone)
         this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandExecuted: {
-        if (this.currentZone?.type === FinalTermOscPt.CommandStart) {
-          this.currentZone.endLine = currentLine - 1
+        if (this.currentZone?.command) {
+          // 更新命令输入区域的结束位置
+          this.currentZone.command.end = { x: currentCol, y: currentLine }
+          // 开始记录输出区域
+          this.currentZone.output = {
+            start: { x: currentCol, y: currentLine },
+            end: { x: currentCol, y: currentLine }, // 结束位置将在 CommandFinished 时更新
+          }
         }
-
-        this.currentZone = {
-          type: FinalTermOscPt.CommandExecuted,
-          startLine: currentLine,
-        }
-        this.zones.push(this.currentZone)
         this.terminal.registerMarker(currentLine)
         return true
       }
       case FinalTermOscPt.CommandFinished: {
-        if (this.currentZone?.type === FinalTermOscPt.CommandExecuted) {
-          this.currentZone.endLine = currentLine - 1
+        if (this.currentZone) {
+          if (this.currentZone.output) {
+            // 更新输出区域的结束位置
+            this.currentZone.output.end = { x: currentCol, y: currentLine }
+          }
+          // 完成当前语义区域
+          this.currentZone.endLine = currentLine
+          this.currentZone.exitCode = args[0]
+          this.currentZone = undefined
         }
-
-        this.currentZone = {
-          type: FinalTermOscPt.CommandFinished,
-          startLine: currentLine,
-          exitCode: args[0],
-        }
-        this.zones.push(this.currentZone)
         this.terminal.registerMarker(currentLine)
         return true
       }

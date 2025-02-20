@@ -73,8 +73,8 @@
   import { storeToRefs } from 'pinia'
 
   import UploadListItem from './UploadListItem.vue'
-  import { useWebShellUploadStore } from '@/stores/webShellUpload'
-  import type { UploadSession } from '@/services/webSocketBase/uploadService'
+  import { useWebShellUploadStore } from '@/stores/webshellUpload'
+  import type { UploadSession } from '@/services/websocketBase/uploadService'
 
   defineOptions({ inheritAttrs: false })
 

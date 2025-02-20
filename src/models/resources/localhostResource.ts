@@ -1,7 +1,7 @@
-import { WebShellResource, type WebShellResourceInit } from './webShellResource'
+import { WebShellResource, type WebShellResourceInit } from './webshellResource'
 
 interface LocalhostResourceInit extends WebShellResourceInit {
-  port: number
+  port?: number
 }
 
 export class LocalhostResource extends WebShellResource {
@@ -9,11 +9,11 @@ export class LocalhostResource extends WebShellResource {
 
   constructor(init: LocalhostResourceInit) {
     super(init)
-    this.port = init.port
+    this.port = init.port ?? 1234
   }
 
   async fetchWsUrl(): Promise<string> {
     await new Promise(resolve => setTimeout(resolve, 1000))
-    return `ws://localhost:${this.port}`
+    return `ws://localhost:${this.port}/shell/local`
   }
 }
