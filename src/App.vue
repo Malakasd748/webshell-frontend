@@ -19,7 +19,7 @@
   import { defineComponent } from 'vue'
   import { NConfigProvider, NModalProvider, NMessageProvider, NDialogProvider, darkTheme, useDialog, useMessage } from 'naive-ui'
 
-  import naiveThemeOverride from './theme/naiveThemeOverride'
+  import naiveThemeOverride from './theme/naiveThemeOverrides'
   import naiveApi from '@/providers/naiveApi'
 
   const NaiveApiProvider = defineComponent({

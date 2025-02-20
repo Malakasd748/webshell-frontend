@@ -1,7 +1,7 @@
 <template>
   <NLayout
     class="h-full"
-    style="background-color: var(--panel-background-color)"
+    style="background-color: var(--ws-panel-background-color)"
   >
     <NLayoutHeader
       bordered
@@ -34,6 +34,7 @@
             class="ml-auto"
             size="small"
             :rubber-band="false"
+            :theme-overrides="{railColorActive: 'var(--primary-color)' }"
           />
         </template>
       </NTooltip>

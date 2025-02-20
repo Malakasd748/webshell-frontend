@@ -1,17 +1,12 @@
 <template>
   <div
-    ref="card-container"
-    class="outline-(.5px solid #4b4b4b) rounded-1 cursor-pointer relative"
-    :style="{
-      backgroundColor: theme.background,
-      outlineColor: cardHovered || checked ? 'var(--color-primary)' : undefined,
-      outlineWidth: cardHovered || checked ? '2px' : undefined,
-    }"
+    class="group outline-(.5px solid #4b4b4b) rounded-1 cursor-pointer relative hover:(outline-(2px solid [--primary-color]))"
+    :class="[checked ? 'outline-(2px solid [--color-primary]!) text-[--primary-color]' : undefined]"
+    :style="{ backgroundColor: theme.background }"
     @click="settingsStore.setConfig({ themeName })"
   >
     <div
-      class="px-4 py-2.5 rounded-t-1 border-b-(1 color-#4b4b4b)"
-      :style="{ color: cardHovered || checked ? 'var(--color-primary)' : undefined }"
+      class="px-4 py-2.5 rounded-t-1 border-b-(1 color-#4b4b4b) group-hover:text-[--primary-color]"
     >
       {{ themeName }}
     </div>
@@ -23,7 +18,7 @@
 
     <template v-if="checked">
       <div
-        class="absolute bottom-0 right-0 size-0 border-r-(28px color-primary) border-t-(28px transparent)"
+        class="absolute bottom--0.25 right--0.25 size-0 rounded-0.75 border-r-(28px solid [--primary-color]) border-t-(28px solid transparent)"
       ></div>
       <div
         class="i-ant-design:check-outlined color-white bottom-0.5 right-0.5 absolute size-3"
@@ -36,7 +31,6 @@
   import { useTemplateRef, onMounted, computed, watch } from 'vue'
   import { Terminal } from '@xterm/xterm'
   import { FitAddon } from '@xterm/addon-fit'
-  import { useElementHover } from '@vueuse/core'
 
   import { availableThemes, useWebShellSettingStore } from '@/stores/webShellSettings'
 
@@ -45,8 +39,6 @@
   const settingsStore = useWebShellSettingStore()
 
   const terminalContainer = useTemplateRef('terminal-container')
-  const cardContainer = useTemplateRef('card-container')
-  const cardHovered = useElementHover(cardContainer)
 
   const checked = computed(() => settingsStore.themeName === themeName)
 

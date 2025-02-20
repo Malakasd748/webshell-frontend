@@ -3,10 +3,9 @@
     ref="fullscreenTarget"
     class="h-screen"
     content-class="flex-(~ col)"
-    style="--panel-background-color: #141414"
   >
     <NLayoutHeader
-      style="background-color: var(--panel-background-color)"
+      style="background-color: var(--ws-panel-background-color)"
       bordered
     >
       <TermHeader
@@ -67,7 +66,7 @@
         <NLayoutFooter
           v-if="!settingsTabSelected"
           class="mt-auto"
-          style="background-color: var(--panel-background-color)"
+          style="background-color: var(--ws-panel-background-color)"
           bordered
         >
           <TermFooter />

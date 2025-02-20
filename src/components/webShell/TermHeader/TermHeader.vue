@@ -8,6 +8,7 @@
         v-model:value="activeTab"
         type="segment"
         animated
+        :theme-overrides="tabsThemeOverrides"
       >
         <NTab
           :ref="(inst: any) => (tabRefs.settings = inst?.$el)"
@@ -130,6 +131,7 @@
 <script setup lang="ts">
   import { watch } from 'vue'
   import { NTabs, NTab, NTooltip, NDivider, NScrollbar, NButton } from 'naive-ui'
+  import type { TabsProps } from 'naive-ui'
 
   import ResourcePopselect from './ResourcePopselect.vue'
   import { useWebShellTermStore } from '@/stores/webShellTerm'
@@ -165,6 +167,15 @@
   function removeTab(term: Term) {
     delete tabRefs[term.id]
     webshellTermStore.removeTerm(term)
+  }
+
+  const tabsThemeOverrides: NonNullable<TabsProps['themeOverrides']> = {
+    colorSegment: 'rgba(255, 255, 255, 0.04)',
+    tabTextColorHoverSegment: '#3f8cff',
+    tabTextColorActiveSegment: '#3f8cff',
+    tabColorSegment: 'var(--panel-background-color)',
+    tabBorderRadius: '0',
+    tabPaddingMediumSegment: '8px 8px',
   }
 </script>
 
