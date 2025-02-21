@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
+import naiveApi from '@/providers/naiveApi'
 
 interface RetryConfig {
   retry: number
@@ -36,6 +37,7 @@ class AxiosService {
     }
 
     this.setupTokenRefresh()
+    this.setupErrorHandler()
   }
 
   private setupRetry(config: RetryConfig) {
@@ -104,6 +106,21 @@ class AxiosService {
               resolve(this.axios(originalConfig))
             })
           })
+        }
+
+        return Promise.reject(error)
+      },
+    )
+  }
+
+  private setupErrorHandler() {
+    this.axios.interceptors.response.use(
+      response => response,
+      (error: AxiosError) => {
+        const msg = (<{ error?: string }>error.response?.data)?.error
+
+        if (msg) {
+          naiveApi.message.error(msg)
         }
 
         return Promise.reject(error)
