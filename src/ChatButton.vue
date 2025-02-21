@@ -68,7 +68,7 @@
 
         <template #footer>
           <NInput
-            ref="inputRef"
+            ref="input-ref"
             v-model:value="inputValue"
             :disabled="inputDisabled"
             type="textarea"
@@ -102,12 +102,13 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, shallowReactive, watch, useTemplateRef } from 'vue'
-  import { message } from 'ant-design-vue'
-  import { NFloatButton, NDrawer, NDrawerContent, NInput, NButton } from 'naive-ui'
   import { useKeyModifier } from '@vueuse/core'
+  import type { InputInst } from 'naive-ui'
+  import { NButton, NDrawer, NDrawerContent, NFloatButton, NInput } from 'naive-ui'
+  import { ref, shallowReactive, useTemplateRef, watch } from 'vue'
 
   import { getChatResponse } from '@/api/webshell'
+  import naiveApi from './providers/naiveApi'
 
   import ChatImg from '@/assets/images/webshell/chat.png'
 
@@ -125,7 +126,7 @@
 
   const messages = shallowReactive([] as ChatMessage[])
   const showDrawer = ref(false)
-  const inputRef = useTemplateRef('inputRef')
+  const inputRef = useTemplateRef<InputInst>('input-ref')
   const inputValue = ref('')
   const inputDisabled = ref(false)
 
@@ -144,7 +145,8 @@
         messages.at(-1)!.content = res.content
       })
       .catch((err) => {
-        message.error(err.message ?? err.response?.data?.reponse?.error)
+        // eslint-disable-next-line
+        naiveApi.message.error(err.message ?? err.response?.data?.reponse?.error)
         messages.pop()
       })
       .finally(() => {
