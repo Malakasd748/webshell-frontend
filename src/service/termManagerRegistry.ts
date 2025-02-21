@@ -1,7 +1,7 @@
 import { shallowReadonly } from 'vue'
 
 import type { ShellTerminal } from './websocketBase/shellService'
-import type { WebShellWSManager } from './webshell/webShellWSManager'
+import type { WebShellWSManager } from './webshell/webshellWSManager'
 import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {

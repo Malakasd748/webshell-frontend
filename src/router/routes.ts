@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import WebShell from '@/views/WebShell.vue'
+import WebShell from '@/views/WebshellView.vue'
 
 export const routes: RouteRecordRaw[] = [
   {

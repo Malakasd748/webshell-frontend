@@ -40,7 +40,7 @@
       </NTabs>
     </NScrollbar>
 
-    <ResourcePopselect>
+    <ResourcePopselect @new-ssh="showSshModal = true">
       <NButton
         class="tab-bar-btn"
         quaternary
@@ -121,23 +121,26 @@
       </template>
     </NTooltip> -->
 
-    <NDivider vertical />
+    <!-- <NDivider vertical />
 
     <div class="i-ant-design:user-outlined tab-bar-icon mx-2"></div>
-    <div>user</div>
+    <div>user</div> -->
+
+    <SSHModal v-model:show="showSshModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { watch } from 'vue'
-  import { NTabs, NTab, NTooltip, NDivider, NScrollbar, NButton } from 'naive-ui'
   import type { TabsProps } from 'naive-ui'
+  import { NButton, NScrollbar, NTab, NTabs, NTooltip } from 'naive-ui'
+  import { watch, ref } from 'vue'
 
-  import ResourcePopselect from './ResourcePopselect.vue'
-  import { useWebShellTermStore } from '@/stores/webshellTerm'
-  import { useWebShellStateStore } from '@/stores/webshellStates'
   import { TermManagerRegistry } from '@/service/termManagerRegistry'
+  import { useWebShellStateStore } from '@/stores/webshellStates'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
   import type { Term } from '@/xterm'
+  import ResourcePopselect from './ResourcePopselect.vue'
+  import SSHModal from './SSHModal.vue'
 
   const webshellStateStore = useWebShellStateStore()
   const webshellTermStore = useWebShellTermStore()
@@ -153,6 +156,8 @@
     (e: 'common-commands'): void
     (e: 'documentation'): void
   }>()
+
+  const showSshModal = ref(false)
 
   const tabRefs: Record<string, HTMLDivElement> = {}
 

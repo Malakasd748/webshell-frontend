@@ -1,47 +1,35 @@
-import { ref } from 'vue'
-import { useAsyncState } from '@vueuse/core'
+import { shallowRef, shallowReactive } from 'vue'
 import { defineStore } from 'pinia'
 
-import { LocalhostResource } from '@/models/resources/localhostResource'
-import { SSHResource } from '@/models/resources/sshResource'
 import type { WebShellResource } from '@/models/resources/webshellResource'
 
 export const useWebShellResourceStore = defineStore('webshell-resource', () => {
-  const localhostResource = new LocalhostResource({ id: '123', name: 'localhost', port: 1234 })
-  const sshResource = new SSHResource({
-    id: 'ssh',
-    name: 'ssh',
-    host: import.meta.env.VITE_SSH_HOST,
-    port: Number(import.meta.env.VITE_SSH_PORT),
-    username: import.meta.env.VITE_SSH_USERNAME,
-    password: import.meta.env.VITE_SSH_PASSWORD,
-  })
+  const resources = shallowRef<WebShellResource[]>(shallowReactive([]))
 
-  const fetchResources = useAsyncState<WebShellResource[]>(
-    async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return [localhostResource, sshResource]
-    },
-    [],
-    { immediate: false },
-  )
+  const selectedResource = shallowRef<WebShellResource>()
 
-  const selectedResource = ref<WebShellResource>()
-
-  function selectResourceById(id: string) {
-    const resource = fetchResources.state.value.find(r => r.id === id)
-    if (resource) {
-      selectedResource.value = resource
-      return true
+  function selectResource(resource: WebShellResource): void
+  function selectResource(name: string): void
+  function selectResource(resourceOrName: WebShellResource | string) {
+    if (typeof resourceOrName === 'string') {
+      selectedResource.value = resources.value.find(r => r.name === resourceOrName)
+    } else {
+      selectedResource.value = resourceOrName
     }
-    return false
+  }
+
+  function addResource(resource: WebShellResource) {
+    if (resources.value.some(r => r.name === resource.name)) {
+      throw new Error(`资源名称 "${resource.name}" 已存在`)
+    }
+    resources.value.push(resource)
   }
 
   return {
-    resources: fetchResources.state,
+    resources,
     selectedResource,
 
-    selectResourceById,
-    fetchResources: () => fetchResources.execute(),
+    selectResource,
+    addResource,
   }
 })

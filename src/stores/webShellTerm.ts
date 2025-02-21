@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 
 import { Term } from '../xterm'
 import { WebShellResource } from '@/models/resources/webshellResource'
-import { WebShellWSManager } from '@/service/webshell/webShellWSManager'
+import { WebShellWSManager } from '@/service/webshell/webshellWSManager'
 import { useWebShellResourceStore } from './webshellResource'
 import { useWebShellSettingStore } from './webshellSettings'
 import { TermManagerRegistry } from '@/service/termManagerRegistry'
@@ -27,19 +27,19 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
   })
 
   function addTerm(): Promise<void>
-  function addTerm(resourceId: string): Promise<void>
+  function addTerm(resourceName: string): Promise<void>
   function addTerm(resource: WebShellResource): Promise<void>
   async function addTerm(
-    resourceOrId: string | WebShellResource | undefined = resourceStore.selectedResource,
+    resourceOrName: string | WebShellResource | undefined = resourceStore.selectedResource,
   ) {
-    if (resourceOrId === undefined) {
+    if (resourceOrName === undefined) {
       throw new Error('No resource selected')
     }
 
     const resource
-      = resourceOrId instanceof WebShellResource
-        ? resourceOrId
-        : resourceStore.resources.find(r => r.id === resourceOrId)
+      = resourceOrName instanceof WebShellResource
+        ? resourceOrName
+        : resourceStore.resources.find(r => r.name === resourceOrName)
     if (resource === undefined) {
       throw new Error('invalid resource id')
     }

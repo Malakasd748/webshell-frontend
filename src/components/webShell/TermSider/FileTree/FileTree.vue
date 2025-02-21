@@ -49,7 +49,7 @@
   import { FileTreeContextMenu } from './contextMenu'
   import type { ContextMenuActions, ContextMenuOption } from './contextMenu'
   import FileTreeNodeEdit from './FileTreeNodeEdit.vue'
-  import type { WebShellWSManager } from '@/service/webshell/webShellWSManager'
+  import type { WebShellWSManager } from '@/service/webshell/webshellWSManager'
   import type { WebShellFSTreeNode } from '@/service/webshell/webshellFSService'
   import { useWebShellTermStore } from '@/stores/webshellTerm'
   import naiveApi from '@/providers/naiveApi'

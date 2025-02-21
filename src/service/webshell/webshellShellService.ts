@@ -1,6 +1,6 @@
 import { ShellService, type ShellTerminal } from '../websocketBase/shellService'
 import { TermManagerRegistry } from '../termManagerRegistry'
-import { WebShellWSManager } from './webShellWSManager'
+import { WebShellWSManager } from './webshellWSManager'
 import { useWebShellTermStore } from '@/stores/webshellTerm'
 
 export class WebshellShellService extends ShellService {

@@ -1,4 +1,4 @@
-import type { WebSocketManager } from './webSocketManager'
+import type { WebSocketManager } from './websocketManager'
 
 export abstract class WebSocketService {
   abstract readonly name: string

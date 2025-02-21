@@ -2,7 +2,7 @@ import { h, shallowReactive } from 'vue'
 
 import { UploadService, UploadSession } from '../websocketBase/uploadService'
 import type { DuplicatePolicy } from '../websocketBase/uploadService'
-import type { WebShellWSManager } from './webShellWSManager'
+import type { WebShellWSManager } from './webshellWSManager'
 import ConfirmActions from './ConfirmActions.vue'
 import naiveApi from '@/providers/naiveApi'
 

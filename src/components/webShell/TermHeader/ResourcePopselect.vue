@@ -1,48 +1,57 @@
 <template>
   <NPopselect
     v-bind="props"
-    v-model:value="selectedResourceId"
+    v-model:value="selectedResourceName"
     :options="options"
     @update:value="(id) => termStore.addTerm(id)"
   >
     <slot></slot>
 
+    <template #header>
+      <NButton
+        class="w-full"
+        text
+        @click="emit('new-ssh')"
+      >
+        新建 SSH 连接
+      </NButton>
+    </template>
+
     <template #empty>
-      <NSpin :show="false">
-        <NEmpty />
-      </NSpin>
+      <NEmpty
+        description="暂无 SSH 连接"
+        :show-icon="false"
+      />
     </template>
   </NPopselect>
 </template>
 
 <script setup lang="ts">
+  import { NButton, NPopselect, popselectProps, NEmpty } from 'naive-ui'
   import { computed } from 'vue'
-  import { NPopselect, popselectProps, NSpin, NEmpty } from 'naive-ui'
 
   import { useWebShellResourceStore } from '@/stores/webshellResource'
   import { useWebShellTermStore } from '@/stores/webshellTerm'
-  // import { webshellNotifyOpenerReady, setupWebshell } from '@/utils/webShell/windowMessage'
 
   const props = defineProps(popselectProps)
+  const emit = defineEmits(['new-ssh'])
 
   const resourceStore = useWebShellResourceStore()
   const termStore = useWebShellTermStore()
 
-  const selectedResourceId = computed({
-    get: () => resourceStore.selectedResource?.id,
-    set: (id) => {
-      if (id !== undefined) {
-        resourceStore.selectResourceById(id)
+  const selectedResourceName = computed({
+    get: () => resourceStore.selectedResource?.name,
+    set: (name) => {
+      if (name !== undefined) {
+        resourceStore.selectResource(name)
       }
     },
   })
 
   const options = computed(() =>
-    resourceStore.resources.map(r => ({ label: r.name, value: r.id })),
+    resourceStore.resources.map(r => ({ label: r.name, value: r.name })),
   )
 
-  // setupWebshell()
-  // webshellNotifyOpenerReady()
 </script>
 
 <style scoped></style>

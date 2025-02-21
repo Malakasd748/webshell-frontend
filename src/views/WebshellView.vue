@@ -1,6 +1,6 @@
 <template>
   <NLayout
-    ref="fullscreenTarget"
+    ref="fullscreen-target"
     class="h-screen"
     content-class="flex-(~ col)"
   >
@@ -87,16 +87,15 @@
 <script setup lang="ts">
   import { useFullscreen } from '@vueuse/core'
   import { NButton, NLayout, NLayoutFooter, NLayoutHeader, NLayoutSider } from 'naive-ui'
-  import { computed, ref, useTemplateRef, watchEffect, onMounted, watch } from 'vue'
+  import { computed, ref, useTemplateRef, watchEffect, watch } from 'vue'
 
-  import { useWebShellStateStore } from '../stores/webshellStates'
-  import { useWebShellTermStore } from '../stores/webshellTerm'
-  import { useWebShellResourceStore } from '../stores/webshellResource'
-  import TermBody from '@/components/webShell/TermBody'
-  import TermFooter from '@/components/webShell/TermFooter'
-  import TermHeader from '@/components/webShell/TermHeader'
-  import TermSettings from '@/components/webShell/TermSettings'
-  import TermSider from '@/components/webShell/TermSider'
+  import { useWebShellStateStore } from '@/stores/webshellStates'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
+  import TermBody from '@/components/webshell/TermBody'
+  import TermFooter from '@/components/webshell/TermFooter'
+  import TermHeader from '@/components/webshell/TermHeader'
+  import TermSettings from '@/components/webshell/TermSettings'
+  import TermSider from '@/components/webshell/TermSider'
   import { Term } from '@/xterm'
   import { TermManagerRegistry } from '@/service/termManagerRegistry'
 
@@ -106,35 +105,29 @@
 
   const stateStore = useWebShellStateStore()
   const termStore = useWebShellTermStore()
-  const resourceStore = useWebShellResourceStore()
   const terms = termStore.terms
 
   Term.registerNewTermCallback((t) => {
     setTimeout(() => (activeTab.value = t.id), 10)
   })
 
-  const fullscreenTarget = useTemplateRef('fullscreenTarget')
+  const fullscreenTarget = useTemplateRef('fullscreen-target')
   const fullscreen = useFullscreen(fullscreenTarget)
 
   watchEffect(() => (stateStore.isFullscreen = fullscreen.isFullscreen.value))
-
-  onMounted(async () => {
-    await resourceStore.fetchResources()
-    if (resourceStore.resources.length > 0) {
-      resourceStore.selectResourceById(resourceStore.resources[0].id)
-      await termStore.addTerm()
-    }
-  })
 
   watch(() => termStore.terms.length, (newLength, oldLength) => {
     if (newLength >= oldLength) {
       return
     }
-    console.log('watch')
-    if (activeTab.value !== 'settings' && terms.find(t => t.id === activeTab.value) === undefined) {
+    const preTab = activeTab.value
+
+    if (activeTab.value !== 'settings' && terms.find(t => t.id === preTab) === undefined) {
       setTimeout(() => {
         activeTab.value = terms.at(-1)?.id || 'settings'
       }, 10)
+    } else {
+      setTimeout(() => activeTab.value = preTab, 10)
     }
   })
 </script>

@@ -9,10 +9,10 @@ interface SSHResourceInit extends WebShellResourceInit {
 }
 
 export class SSHResource extends WebShellResource {
-  private host: string
-  private port: number
-  private username: string
-  private password: string
+  readonly host: string
+  readonly port: number
+  readonly username: string
+  readonly password: string
 
   constructor(init: SSHResourceInit) {
     super(init)
