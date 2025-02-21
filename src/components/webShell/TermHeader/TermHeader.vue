@@ -170,10 +170,10 @@
   }
 
   const tabsThemeOverrides: NonNullable<TabsProps['themeOverrides']> = {
-    colorSegment: 'rgba(255, 255, 255, 0.04)',
+    colorSegment: 'rgba(255,255,255,0.04)',
     tabTextColorHoverSegment: '#3f8cff',
     tabTextColorActiveSegment: '#3f8cff',
-    tabColorSegment: 'var(--panel-background-color)',
+    tabColorSegment: '#141414',
     tabBorderRadius: '0',
     tabPaddingMediumSegment: '8px 8px',
   }

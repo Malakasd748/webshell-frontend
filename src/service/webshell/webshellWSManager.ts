@@ -10,7 +10,7 @@ import type { UploadSession } from '../websocketBase/uploadService'
 import { WebShellResource } from '@/models/resources/webshellResource'
 
 export class WebShellWSManager extends WebSocketManager {
-  ptyService: WebshellShellService
+  shellService: WebshellShellService
   fsService: WebShellFSService
   uploadService: WebShellUploadService
   heartbeatService: WebShellHeartbeatService
@@ -19,7 +19,7 @@ export class WebShellWSManager extends WebSocketManager {
   constructor(url: string | URL, readonly resource: WebShellResource) {
     super(url)
 
-    this.ptyService = new WebshellShellService()
+    this.shellService = new WebshellShellService()
     this.fsService = new WebShellFSService()
     this.heartbeatService = new WebShellHeartbeatService()
 
@@ -29,7 +29,7 @@ export class WebShellWSManager extends WebSocketManager {
     const reactiveThis = shallowReactive(this)
 
     resource.manager = reactiveThis
-    reactiveThis.registerService(this.ptyService)
+    reactiveThis.registerService(this.shellService)
     reactiveThis.registerService(this.fsService)
     reactiveThis.registerService(this.uploadService)
     reactiveThis.registerService(this.heartbeatService)

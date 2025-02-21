@@ -1,4 +1,4 @@
-import { shallowRef, watchEffect } from 'vue'
+import { shallowRef, watchEffect, shallowReactive } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
@@ -7,12 +7,13 @@ import { WebShellResource } from '@/models/resources/webshellResource'
 import { WebShellWSManager } from '@/service/webshell/webShellWSManager'
 import { useWebShellResourceStore } from './webshellResource'
 import { useWebShellSettingStore } from './webshellSettings'
+import { TermManagerRegistry } from '@/service/termManagerRegistry'
 
 export const useWebShellTermStore = defineStore('webshell-term', () => {
   const resourceStore = useWebShellResourceStore()
   const settingStore = useWebShellSettingStore()
 
-  const terms = shallowRef<Term[]>([])
+  const terms = shallowRef<Term[]>(shallowReactive([]))
   const lastFocusedTerm = shallowRef<Term>()
 
   Term.registerNewTermCallback((term) => {
@@ -50,7 +51,7 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
     }
 
     const term = new Term()
-    manager.ptyService.addTerm(term)
+    manager.shellService.addTerm(term)
 
     watchEffect(() => {
       term.options.theme = settingStore.theme
@@ -82,7 +83,8 @@ export const useWebShellTermStore = defineStore('webshell-term', () => {
     }
 
     terms.value.splice(index, 1)
-    termToDispose.dispose()
+
+    TermManagerRegistry.getManager(termToDispose)?.shellService.removeTerm(termToDispose)
   }
 
   return {

@@ -30,7 +30,7 @@ export class TermManagerRegistry {
 
   static unregister(term: ShellTerminal) {
     const socket = this.managerMap.get(term.id)
-    socket?.ptyService.removeTerm(term)
+    socket?.shellService.removeTerm(term)
     return this.managerMap.delete(term.id)
   }
 }

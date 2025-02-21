@@ -11,9 +11,9 @@ export const useWebShellResourceStore = defineStore('webshell-resource', () => {
   const sshResource = new SSHResource({
     id: 'ssh',
     name: 'ssh',
-    host: 'localhost',
-    port: 22,
-    username: 'vicii',
+    host: import.meta.env.VITE_SSH_HOST,
+    port: Number(import.meta.env.VITE_SSH_PORT),
+    username: import.meta.env.VITE_SSH_USERNAME,
     password: import.meta.env.VITE_SSH_PASSWORD,
   })
 

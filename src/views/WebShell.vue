@@ -87,7 +87,7 @@
 <script setup lang="ts">
   import { useFullscreen } from '@vueuse/core'
   import { NButton, NLayout, NLayoutFooter, NLayoutHeader, NLayoutSider } from 'naive-ui'
-  import { computed, ref, useTemplateRef, watchEffect, onMounted } from 'vue'
+  import { computed, ref, useTemplateRef, watchEffect, onMounted, watch } from 'vue'
 
   import { useWebShellStateStore } from '../stores/webshellStates'
   import { useWebShellTermStore } from '../stores/webshellTerm'
@@ -111,12 +111,6 @@
 
   Term.registerNewTermCallback((t) => {
     setTimeout(() => (activeTab.value = t.id), 10)
-    t.onSelectionChange(() => {
-      const selected = t.getSelection()
-      if (!selected) {
-        return
-      }
-    })
   })
 
   const fullscreenTarget = useTemplateRef('fullscreenTarget')
@@ -129,6 +123,18 @@
     if (resourceStore.resources.length > 0) {
       resourceStore.selectResourceById(resourceStore.resources[0].id)
       await termStore.addTerm()
+    }
+  })
+
+  watch(() => termStore.terms.length, (newLength, oldLength) => {
+    if (newLength >= oldLength) {
+      return
+    }
+    console.log('watch')
+    if (activeTab.value !== 'settings' && terms.find(t => t.id === activeTab.value) === undefined) {
+      setTimeout(() => {
+        activeTab.value = terms.at(-1)?.id || 'settings'
+      }, 10)
     }
   })
 </script>
