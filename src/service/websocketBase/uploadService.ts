@@ -271,7 +271,6 @@ export class UploadService extends WebSocketService {
         if (done) {
           void reader.cancel()
           session.doneFilesCount += 1
-          session.doneSize += entry.file.size
 
           const digest = hasher.digest()
           await this.request(session.path, UploadAction.CompleteFile, { digest })

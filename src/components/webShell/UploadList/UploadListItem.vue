@@ -24,7 +24,7 @@
           </NEllipsis>
           <div :style="{ color: textColorDisabled }">
             <template v-if="showSizeProgress">
-              {{ getSize(session.doneSize) }} / {{ getSize(session.doneSize) }}
+              {{ getSize(session.doneSize) }} / {{ getSize(session.totalSize) }}
             </template>
             <NDivider
               v-if="showSizeProgress && showCountProgress"
