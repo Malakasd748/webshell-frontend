@@ -74,7 +74,7 @@
 
   import UploadListItem from './UploadListItem.vue'
   import { useWebShellUploadStore } from '@/stores/webshellUpload'
-  import type { UploadSession } from '@/services/websocketBase/uploadService'
+  import type { UploadSession } from '@/service/websocketBase/uploadService'
 
   defineOptions({ inheritAttrs: false })
 

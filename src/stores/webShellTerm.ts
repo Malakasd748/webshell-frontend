@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 
 import { Term } from '../xterm'
 import { WebShellResource } from '@/models/resources/webshellResource'
-import { WebShellWSManager } from '@/services/webshell/webShellWSManager'
+import { WebShellWSManager } from '@/service/webshell/webShellWSManager'
 import { useWebShellResourceStore } from './webshellResource'
 import { useWebShellSettingStore } from './webshellSettings'
 

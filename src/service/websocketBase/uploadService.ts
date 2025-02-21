@@ -126,8 +126,9 @@ export class UploadService extends WebSocketService {
       } else {
         await this.inputDirectoryUpload(dest)
       }
+    } else {
+      throw new TypeError('invalid parameter')
     }
-    throw new TypeError('invalid parameter')
   }
 
   private async filePickerUpload(dest: string): Promise<void> {
@@ -438,6 +439,8 @@ export class UploadSession {
 
   private async setupFileList(files: FileList) {
     for (let i = 0; i < files.length; i++) {
+      if (this.status === 'cancelled') return
+
       this.countFile(join(this.dest, files[i].webkitRelativePath), files[i])
       if (i % 100 === 0) {
         await new Promise(resolve => setTimeout(resolve))
@@ -452,6 +455,8 @@ export class UploadSession {
 
   private async setupDirectoryEntry(entry: FileSystemDirectoryEntry) {
     const setupEntry = async (parent: string, entry: FileSystemEntry) => {
+      if (this.status === 'cancelled') return
+
       if (entry.isFile) {
         const file = await new Promise<File>((resolve, reject) =>
           (entry as FileSystemFileEntry).file(resolve, reject),
@@ -494,6 +499,8 @@ export class UploadSession {
 
   private async setupDirectoryHandle(handle: FileSystemDirectoryHandle) {
     const setupHandle = async (parent: string, handle: FileSystemHandle) => {
+      if (this.status === 'cancelled') return
+
       if (handle.kind === 'file') {
         const file = await (handle as FileSystemFileHandle).getFile()
         this.countFile(join(parent, file.name), file)

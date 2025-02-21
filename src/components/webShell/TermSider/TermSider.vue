@@ -68,7 +68,7 @@
   import { NButton, NLayout, NLayoutHeader, NSwitch, NTooltip } from 'naive-ui'
   import { ref } from 'vue'
 
-  import type { WebShellWSManager } from '@/services/webshell/webShellWSManager'
+  import type { WebShellWSManager } from '@/service/webshell/webShellWSManager'
   import FileTree from './FileTree'
 
   const { manager } = defineProps<{

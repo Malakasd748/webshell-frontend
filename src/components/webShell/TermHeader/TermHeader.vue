@@ -136,7 +136,7 @@
   import ResourcePopselect from './ResourcePopselect.vue'
   import { useWebShellTermStore } from '@/stores/webshellTerm'
   import { useWebShellStateStore } from '@/stores/webshellStates'
-  import { TermManagerRegistry } from '@/services/termManagerRegistry'
+  import { TermManagerRegistry } from '@/service/termManagerRegistry'
   import type { Term } from '@/xterm'
 
   const webshellStateStore = useWebShellStateStore()

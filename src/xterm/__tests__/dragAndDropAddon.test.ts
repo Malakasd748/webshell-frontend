@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { DragAndDropAddon } from '../dragAndDropAddon'
-import { UploadService, UploadSession } from '../../services/websocketBase/uploadService'
+import { UploadService, UploadSession } from '../../service/websocketBase/uploadService'
 import type { Term } from '..'
 
 // Mock DragEvent for Node.js environment

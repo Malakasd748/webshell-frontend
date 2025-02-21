@@ -44,7 +44,7 @@
   import UploadList from '../UploadList'
   import { useWebShellUploadStore } from '@/stores/webshellUpload'
   import { useWebShellTermStore } from '@/stores/webshellTerm'
-  import { TermManagerRegistry } from '@/services/termManagerRegistry'
+  import { TermManagerRegistry } from '@/service/termManagerRegistry'
 
   const webshellUploadStore = useWebShellUploadStore()
   const webshellTermStore = useWebShellTermStore()
@@ -60,7 +60,6 @@
   watch(
     () => uploadSessions.value.length,
     (newlen, oldlen) => {
-      console.log(newlen, oldlen)
       if (newlen > oldlen) {
         showUploadList.value = true
       }

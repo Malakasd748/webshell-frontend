@@ -98,7 +98,7 @@
   import TermSettings from '@/components/webShell/TermSettings'
   import TermSider from '@/components/webShell/TermSider'
   import { Term } from '@/xterm'
-  import { TermManagerRegistry } from '@/services/termManagerRegistry'
+  import { TermManagerRegistry } from '@/service/termManagerRegistry'
 
   const activeTab = ref<string>('settings')
   const siderCollapsed = ref(false)

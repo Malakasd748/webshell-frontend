@@ -17,7 +17,7 @@
 
   import type { Term } from '@/xterm'
   import { useWebShellSettingStore } from '@/stores/webshellSettings'
-  import { TermManagerRegistry } from '@/services/termManagerRegistry'
+  import { TermManagerRegistry } from '@/service/termManagerRegistry'
 
   const settingsStore = useWebShellSettingStore()
 

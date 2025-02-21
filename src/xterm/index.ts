@@ -7,7 +7,7 @@ import { merge } from 'lodash-es'
 
 import { AutoFitAddon } from './autoFitAddon'
 import { ShellIntegrationAddon } from './shellIntegrationAddon'
-import type { ShellTerminal } from '../services/websocketBase/shellService'
+import type { ShellTerminal } from '../service/websocketBase/shellService'
 
 export class Term extends Terminal implements ShellTerminal {
   readonly id = String(Date.now())

@@ -1,5 +1,5 @@
 import type { DropdownOption } from 'naive-ui'
-import type { WebShellFSTreeNode } from '@/services/webshell/webshellFSService'
+import type { WebShellFSTreeNode } from '@/service/webshell/webshellFSService'
 
 type ContextMenuActionNames = 'rename' | 'delete' | 'copyPath' | 'copy' | 'cut' | 'paste' | 'newFolder' | 'openInTerminal' | 'uploadFile' | 'uploadFolder'
 
