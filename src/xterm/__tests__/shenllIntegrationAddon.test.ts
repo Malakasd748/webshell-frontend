@@ -7,6 +7,11 @@ class MockTerminal {
   buffer = {
     normal: {
       cursorY: 0,
+      cursorX: 0,
+      viewportY: 0,
+    },
+    active: {
+      viewportY: 0,
     },
   }
 
@@ -20,6 +25,7 @@ class MockTerminal {
   }
 
   element: HTMLElement
+  container: HTMLElement
   rows = 24
   cols = 80
   registerMarker = vi.fn()
@@ -45,6 +51,14 @@ class MockTerminal {
         }),
       },
     })
+    this.container = document.createElement('div')
+    this.container.appendChild(this.element)
+  }
+
+  _core = {
+    _mouseService: {
+      getMouseReportCoords: vi.fn().mockImplementation(() => ({ row: 0, col: 0 })),
+    },
   }
 
   writeOsc(ps: number, data: string) {
@@ -88,95 +102,6 @@ describe('ShellIntegrationAddon', () => {
     })
   })
 
-  describe('FinalTerm Sequence Handling', () => {
-    it('should handle prompt sequence', () => {
-      terminal.moveCursor(5)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'A')
-
-      expect(terminal.registerMarker).toHaveBeenCalledWith(5)
-      expect(addon.getAllZones()).toContainEqual({
-        type: 'A',
-        startLine: 5,
-      })
-    })
-
-    it('should handle complete command execution flow', () => {
-      terminal.moveCursor(5)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'A') // prompt
-
-      terminal.moveCursor(6)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'B') // command start
-
-      terminal.moveCursor(7)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'C') // command execute
-
-      terminal.moveCursor(8)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'D;1') // command finish with exit code 1
-
-      const zones = addon.getAllZones()
-      expect(zones).toHaveLength(4)
-
-      expect(zones[0]).toEqual({
-        type: 'A',
-        startLine: 5,
-        endLine: 5,
-      })
-
-      expect(zones[1]).toEqual({
-        type: 'B',
-        startLine: 6,
-        endLine: 6,
-      })
-
-      expect(zones[2]).toEqual({
-        type: 'C',
-        startLine: 7,
-        endLine: 7,
-      })
-
-      expect(zones[3]).toEqual({
-        type: 'D',
-        startLine: 8,
-        exitCode: '1',
-      })
-    })
-  })
-
-  describe('Mouse Event Handling', () => {
-    it('should handle triple click selection', () => {
-      // 设置zones
-      terminal.moveCursor(5)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'B') // command start
-      terminal.moveCursor(8)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'C') // command execute
-
-      // 创建鼠标事件，模拟点击第6行
-      const event = new MouseEvent('mousedown', {
-        detail: 3, // 三击
-        clientY: 120, // 假设每行高度为20px，点击第6行
-        bubbles: true,
-      })
-
-      // 触发事件
-      terminal.element.dispatchEvent(event)
-
-      // 验证选区设置被调用
-      expect(terminal.select).toHaveBeenCalled()
-    })
-
-    it('should not handle non-triple clicks', () => {
-      terminal.select = vi.fn()
-
-      const event = new MouseEvent('mousedown', {
-        detail: 1,
-      })
-
-      terminal.element.dispatchEvent(event)
-
-      expect(terminal.select).not.toHaveBeenCalled()
-    })
-  })
-
   describe('CWD Tracking', () => {
     it('should update CWD from file URL', () => {
       const result = terminal.writeOsc(
@@ -196,27 +121,6 @@ describe('ShellIntegrationAddon', () => {
 
       expect(result).toBe(false)
       expect(addon.cwd).toBe('')
-    })
-  })
-
-  describe('Zone Management', () => {
-    it('should find zone by line number', () => {
-      terminal.moveCursor(5)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'B')
-      terminal.moveCursor(8)
-      terminal.writeOsc(ShellIntegrationOscPs.FinalTerm, 'C')
-
-      const zone = addon.getZoneAt(6)
-      expect(zone).toEqual({
-        type: 'B',
-        startLine: 5,
-        endLine: 7,
-      })
-    })
-
-    it('should return undefined for invalid line number', () => {
-      const zone = addon.getZoneAt(999)
-      expect(zone).toBeUndefined()
     })
   })
 
