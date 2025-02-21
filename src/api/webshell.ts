@@ -21,5 +21,8 @@ export function sshLogin(data: { host: string, port: number, username: string, p
 }
 
 export function getSshWsUrl(id: string) {
-  return `ws://localhost:1234/shell/ssh/${id}`
+  const base = window.location.origin
+  const apiPrefix = import.meta.env.VITE_API_BASE || '/api'
+
+  return base + apiPrefix + `/shell/ssh/${id}`
 }

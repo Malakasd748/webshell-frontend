@@ -143,7 +143,7 @@ class AxiosService {
   }
 }
 
-const defaultService = new AxiosService('/api', {
+const defaultService = new AxiosService(import.meta.env.VITE_API_BASE || '/api', {
   retry: 3,
   retryDelay: 1000,
   shouldRetry: (error: AxiosError) => {
