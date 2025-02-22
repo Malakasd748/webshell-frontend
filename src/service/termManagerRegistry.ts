@@ -2,7 +2,7 @@ import { shallowReadonly } from 'vue'
 
 import type { ShellTerminal } from './websocketBase/shellService'
 import type { WebShellWSManager } from './webshell/webshellWSManager'
-import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
+// import { DragAndDropAddon } from '../xterm/dragAndDropAddon'
 
 export class TermManagerRegistry {
   private static managerMap = new Map<string, WebShellWSManager>()
@@ -12,7 +12,7 @@ export class TermManagerRegistry {
   static register(term: ShellTerminal, manager: WebShellWSManager) {
     this.managerMap.set(term.id, shallowReadonly(manager) as WebShellWSManager)
 
-    term.loadAddon(new DragAndDropAddon(manager.uploadService))
+    // term.loadAddon(new DragAndDropAddon(manager.uploadService))
   }
 
   static getManager(term: ShellTerminal): WebShellWSManager | undefined
