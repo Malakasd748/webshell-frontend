@@ -1,7 +1,7 @@
 import type { DropdownOption } from 'naive-ui'
 import type { WebShellFSTreeNode } from '@/service/webshell/webshellFSService'
 
-type ContextMenuActionNames = 'rename' | 'delete' | 'copyPath' | 'copy' | 'cut' | 'paste' | 'newFolder' | 'openInTerminal' | 'uploadFile' | 'uploadFolder'
+type ContextMenuActionNames = 'rename' | 'delete' | 'copyPath' | 'copy' | 'cut' | 'paste' | 'newFolder' | 'openInTerminal' | 'uploadFile' | 'uploadFolder' | 'download'
 
 export type ContextMenuActions = {
   [action in ContextMenuActionNames]: (node: WebShellFSTreeNode) => void
@@ -47,13 +47,14 @@ export class FileTreeContextMenu implements Required<FileTreeContextMenuStates> 
       { label: '复制路径', key: 'copyPath', show: !this.isMultipleSelect() },
       { label: '在终端打开', key: 'openInTerminal', show: !this.isMultipleSelect() },
       { type: 'divider', key: 'divider4', show: !this.isMultipleSelect() },
+      { label: '下载', key: 'download', show: !this.isMultipleSelect() },
       { label: '上传文件', key: 'uploadFile', show: !this.isMultipleSelect() },
       { label: '上传文件夹', key: 'uploadFolder', show: !this.isMultipleSelect() },
     ]
   }
 
   onSelect(option: string) {
-    switch (option) {
+    switch (option as ContextMenuActionNames) {
       case 'rename':
         this.actions.rename(this.node)
         break
@@ -83,6 +84,9 @@ export class FileTreeContextMenu implements Required<FileTreeContextMenuStates> 
         break
       case 'uploadFolder':
         this.actions.uploadFolder(this.node)
+        break
+      case 'download':
+        this.actions.download(this.node)
         break
     }
   }

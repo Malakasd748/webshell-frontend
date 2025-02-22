@@ -13,6 +13,7 @@ export class SSHResource extends WebShellResource {
   readonly port: number
   readonly username: string
   readonly password: string
+  id?: string
 
   constructor(init: SSHResourceInit) {
     super(init)
@@ -29,6 +30,8 @@ export class SSHResource extends WebShellResource {
       username: this.username,
       password: this.password,
     })
+
+    this.id = res.data.id
 
     return getSshWsUrl(res.data.id)
   }

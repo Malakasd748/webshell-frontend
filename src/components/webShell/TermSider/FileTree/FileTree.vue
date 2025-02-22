@@ -35,24 +35,26 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, h, reactive, watch, onMounted, computed } from 'vue'
-  import { NTree, NEllipsis, NDropdown } from 'naive-ui'
+  import { useKeyModifier } from '@vueuse/core'
+  import { NDropdown, NEllipsis, NTree } from 'naive-ui'
   import type {
     OnLoad,
-    TreeOption,
-    TreeNodeProps,
     RenderLabel,
+    TreeNodeProps,
+    TreeOption,
     TreeOverrideNodeClickBehavior,
   } from 'naive-ui/es/tree/src/interface'
-  import { useKeyModifier } from '@vueuse/core'
+  import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 
-  import { FileTreeContextMenu } from './contextMenu'
-  import type { ContextMenuActions, ContextMenuOption } from './contextMenu'
-  import FileTreeNodeEdit from './FileTreeNodeEdit.vue'
-  import type { WebShellWSManager } from '@/service/webshell/webshellWSManager'
-  import type { WebShellFSTreeNode } from '@/service/webshell/webshellFSService'
-  import { useWebShellTermStore } from '@/stores/webshellTerm'
   import naiveApi from '@/providers/naiveApi'
+  import type { WebShellFSTreeNode } from '@/service/webshell/webshellFSService'
+  import type { WebShellWSManager } from '@/service/webshell/webshellWSManager'
+  import { useWebShellTermStore } from '@/stores/webshellTerm'
+  import type { ContextMenuActions, ContextMenuOption } from './contextMenu'
+  import { FileTreeContextMenu } from './contextMenu'
+  import FileTreeNodeEdit from './FileTreeNodeEdit.vue'
+  import { sshDownload } from '@/api/webshell'
+  import type { SSHResource } from '@/models/resources/sshResource'
 
   const { manager, showHiddenFiles = false } = defineProps<{
     manager: WebShellWSManager
@@ -245,6 +247,9 @@
       const dest = node.isDir ? node : node.parent!
       await manager.uploadService.dialogUpload('directory', dest.path)
       await fsService.value.getChildren(dest)
+    },
+    download(node) {
+      sshDownload((<SSHResource>manager.resource).id ?? '', node.path)
     },
   }
 
