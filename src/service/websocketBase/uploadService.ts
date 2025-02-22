@@ -2,7 +2,7 @@ import { join } from 'pathe'
 import { createSHA256 } from 'hash-wasm'
 
 import { WebSocketService } from './websocketServiceBase'
-import type { WebSocketManager } from './webSocketManager'
+import type { WebSocketManager } from './websocketManager'
 
 enum UploadAction {
   StartSession = 'start_session',

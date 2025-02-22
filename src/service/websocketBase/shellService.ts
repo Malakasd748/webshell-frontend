@@ -1,7 +1,7 @@
 import type { IDisposable, Terminal } from '@xterm/xterm'
 
 import { WebSocketService } from './websocketServiceBase'
-import type { WebSocketManager } from './webSocketManager'
+import type { WebSocketManager } from './websocketManager'
 
 const enum ShellAction {
   Command = 'command',

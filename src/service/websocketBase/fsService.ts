@@ -1,4 +1,4 @@
-import type { WebSocketManager } from './webSocketManager'
+import type { WebSocketManager } from './websocketManager'
 import { WebSocketService } from './websocketServiceBase'
 
 const enum FSAction {

@@ -7,7 +7,7 @@ import ConfirmActions from './ConfirmActions.vue'
 import naiveApi from '@/providers/naiveApi'
 
 // 利用 TypeScript 的声明合并，扩展事件类型
-declare module '../webSocketBase/webSocketManager' {
+declare module '../websocketBase/websocketManager' {
   interface WebSocketManagerEventMap {
     'upload-need-confirm': CustomEvent<UploadSession>
   }

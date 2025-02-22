@@ -1,6 +1,6 @@
 import { shallowReactive } from 'vue'
 
-import { WebSocketManager } from '../websocketBase/webSocketManager'
+import { WebSocketManager } from '../websocketBase/websocketManager'
 import { WebshellShellService } from './webshellShellService'
 import { WebShellFSService } from './webshellFSService'
 import { WebShellUploadService } from './webshellUploadService'
