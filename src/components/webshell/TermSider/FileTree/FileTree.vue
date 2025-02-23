@@ -201,8 +201,8 @@
         },
       })
     },
-    async copyPath(node) {
-      await navigator.clipboard.writeText(node.path)
+    copyPath(node) {
+      void navigator.clipboard.writeText(node.path)
     },
     copy(node) {
       copiedNodes.value = [node]
