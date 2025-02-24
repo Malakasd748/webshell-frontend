@@ -5,6 +5,8 @@ import vue from '@vitejs/plugin-vue'
 import VueJSX from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
 
+const apiBase = import.meta.env.VITE_API_BASE
+
 export default defineConfig({
   plugins: [vue(), VueJSX(), UnoCSS()],
   resolve: {
@@ -19,7 +21,7 @@ export default defineConfig({
   server: {
     port: 5176,
     proxy: {
-      '/api': {
+      [apiBase]: {
         target: 'http://localhost:1234',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
