@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  webshell-frontend:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ../:/app
+    ports:
+      - "5176:5176"
+    command: >
+      sh -c "
+      corepack enable &&
+      corepack install &&
+      corepack prepare pnpm@latest --activate &&
+      pnpm config set registry https://registry.npmmirror.com &&
+      pnpm i &&
+      pnpm dev --host
+      "
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - MAX_USER_WATCHES=524288
+    container_name: webshell-frontend
