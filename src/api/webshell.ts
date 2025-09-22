@@ -31,3 +31,10 @@ export function sshDownload(id: string, path: string) {
   url.searchParams.set('path', path)
   window.location.assign(url)
 }
+
+export function getTcpWsUrl(host: string, port: number) {
+  const url = new URL(apiBase + '/shell/tcp')
+  url.searchParams.set('host', host)
+  url.searchParams.set('port', port.toString())
+  return url.toString()
+}

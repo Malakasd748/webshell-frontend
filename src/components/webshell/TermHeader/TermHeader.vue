@@ -40,7 +40,7 @@
       </NTabs>
     </NScrollbar>
 
-    <ResourcePopselect @new-ssh="showSshModal = true">
+    <ResourcePopselect @new-ssh="showSshModal = true" @new-tcp="showTcpModal = true">
       <NButton
         class="tab-bar-btn"
         quaternary
@@ -127,6 +127,7 @@
     <div>user</div> -->
 
     <SSHModal v-model:show="showSshModal" />
+    <TCPModal v-model:show="showTcpModal" />
   </div>
 </template>
 
@@ -141,6 +142,7 @@
   import type { Term } from '@/xterm'
   import ResourcePopselect from './ResourcePopselect.vue'
   import SSHModal from './SSHModal.vue'
+  import TCPModal from './TCPModal.vue'
 
   const webshellStateStore = useWebShellStateStore()
   const webshellTermStore = useWebShellTermStore()
@@ -158,6 +160,7 @@
   }>()
 
   const showSshModal = ref(false)
+  const showTcpModal = ref(false)
 
   const tabRefs: Record<string, HTMLDivElement> = {}
 

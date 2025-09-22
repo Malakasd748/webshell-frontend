@@ -15,6 +15,13 @@
       >
         新建 SSH 连接
       </NButton>
+      <NButton
+        class="w-full"
+        text
+        @click="emit('new-tcp')"
+      >
+        新建 TCP 连接
+      </NButton>
     </template>
 
     <template #empty>
@@ -34,7 +41,7 @@
   import { useWebShellTermStore } from '@/stores/webshellTerm'
 
   const props = defineProps(popselectProps)
-  const emit = defineEmits(['new-ssh'])
+  const emit = defineEmits(['new-ssh', 'new-tcp'])
 
   const resourceStore = useWebShellResourceStore()
   const termStore = useWebShellTermStore()
